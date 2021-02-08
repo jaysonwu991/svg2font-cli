@@ -1,0 +1,29 @@
+{
+  "include": [
+    "src"
+  ],
+  "exclude": [
+    "node_modules/*"
+  ],
+  "compileOnSave": true,
+  "compilerOptions": {
+    "target": "es5",
+    "allowJs": true,
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "noImplicitReturns": true,
+    "noUnusedLocals": true,
+    "esModuleInterop": true,
+    "strict": false,
+    "outDir": "lib",
+    "declaration": false,
+    "sourceMap": false,
+    "lib": [
+      "es2018",
+      "dom"
+    ],
+    "typeRoots": [
+      "node_modules/@types"
+    ]
+  }
+}

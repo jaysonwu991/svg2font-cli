@@ -1,0 +1,46 @@
+{
+  "name": "svg2font-cli",
+  "version": "0.0.1",
+  "description": "A SVG To Iconfont Project, Just Use Command Line",
+  "main": "src/index.js",
+  "scripts": {
+    "build": "webpack",
+    "prefix": "node lib/index"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+htps://github.com:jayson991/svg2font-cli.git"
+  },
+  "keywords": [
+    "svg",
+    "font",
+    "iconfont",
+    "svg2font-cli"
+  ],
+  "author": "Jayson Wu <wulingjie991@outlook.com>",
+  "license": "ISC",
+  "dependencies": {
+    "svgo": "^1.3.2",
+    "svgpath": "^2.3.0",
+    "svgstore": "^3.0.0-2"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.12.13",
+    "@babel/eslint-parser": "^7.12.13",
+    "@babel/preset-env": "^7.12.13",
+    "@types/node": "^14.14.25",
+    "babel-eslint": "^10.1.0",
+    "babel-loader": "^8.2.2",
+    "clean-webpack-plugin": "^3.0.0",
+    "eslint": "^7.19.0",
+    "eslint-config-prettier": "^7.2.0",
+    "eslint-plugin-prettier": "^3.3.1",
+    "eslint-webpack-plugin": "^2.5.0",
+    "prettier": "^2.1.2",
+    "terser-webpack-plugin": "^5.1.1",
+    "ts-loader": "^8.0.15",
+    "typescript": "^4.1.3",
+    "webpack": "^5.21.2",
+    "webpack-cli": "^4.5.0"
+  }
+}
