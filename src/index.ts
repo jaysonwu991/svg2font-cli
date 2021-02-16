@@ -1,7 +1,7 @@
 import fs from 'fs'
 import svgpath from 'svgpath'
 
-const getSvgPath = (target) => {
+const getSvgPath = (target: string) => {
   const result = []
   const regx = /d="(.*?)"/g
   let matched = []

@@ -2,9 +2,9 @@
   "name": "svg2font-cli",
   "version": "0.0.1",
   "description": "A SVG To Iconfont Project, Just Use Command Line",
-  "main": "src/index.js",
+  "main": "lib/index.js",
   "scripts": {
-    "build": "webpack",
+    "build": "rollup -c",
     "prefix": "node lib/index"
   },
   "repository": {
@@ -26,21 +26,19 @@
   },
   "devDependencies": {
     "@babel/core": "^7.12.13",
-    "@babel/eslint-parser": "^7.12.13",
     "@babel/preset-env": "^7.12.13",
+    "@rollup/plugin-json": "^4.1.0",
+    "@rollup/plugin-node-resolve": "^11.2.0",
     "@types/node": "^14.14.25",
-    "babel-eslint": "^10.1.0",
-    "babel-loader": "^8.2.2",
-    "clean-webpack-plugin": "^3.0.0",
+    "@typescript-eslint/eslint-plugin": "^4.15.1",
+    "@typescript-eslint/parser": "^4.15.1",
     "eslint": "^7.19.0",
     "eslint-config-prettier": "^7.2.0",
     "eslint-plugin-prettier": "^3.3.1",
-    "eslint-webpack-plugin": "^2.5.0",
     "prettier": "^2.1.2",
-    "terser-webpack-plugin": "^5.1.1",
-    "ts-loader": "^8.0.15",
-    "typescript": "^4.1.3",
-    "webpack": "^5.21.2",
-    "webpack-cli": "^4.5.0"
+    "rollup": "^2.39.0",
+    "rollup-plugin-terser": "^7.0.2",
+    "rollup-plugin-typescript2": "^0.29.0",
+    "typescript": "^4.1.3"
   }
 }

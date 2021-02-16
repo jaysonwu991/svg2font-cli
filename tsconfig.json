@@ -7,21 +7,18 @@
   ],
   "compileOnSave": true,
   "compilerOptions": {
-    "target": "es5",
-    "allowJs": true,
-    "module": "CommonJS",
-    "moduleResolution": "node",
-    "noImplicitReturns": true,
-    "noUnusedLocals": true,
-    "esModuleInterop": true,
-    "strict": false,
-    "outDir": "lib",
-    "declaration": false,
+    "target": "ES6",
+    "module": "ESNext",
     "sourceMap": false,
-    "lib": [
-      "es2018",
-      "dom"
-    ],
+    "declaration": false,
+    "outDir": "lib",
+    "moduleResolution": "Node",
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "removeComments": false,
+    "importHelpers": true,
+    "strict": false,
+    "lib": ["ES6", "DOM"],
     "typeRoots": [
       "node_modules/@types"
     ]
