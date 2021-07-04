@@ -1,5 +1,6 @@
 .DS_Store
 yarn.lock
+pnpm-lock.yaml
 yarn-error.log
 package-lock.json
 
