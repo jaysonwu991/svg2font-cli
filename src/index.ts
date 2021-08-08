@@ -1,11 +1,12 @@
-import fs from 'fs'
 import path from 'path'
 import svgpath from 'svgpath'
+import { optimize, OptimizeOptions } from 'svgo'
+import { lstatSync, readdirSync, readFileSync } from 'fs'
 
 const getSvgPath = (target: string) => {
-  const result = []
+  let matched
+  let result!: string[]
   const regx = /d="(.*?)"/g
-  let matched = []
   while ((matched = regx.exec(target))) {
     result.push(matched[1])
   }
@@ -16,14 +17,14 @@ const getSvgPath = (target: string) => {
 const getSvgData: any = (svgPath: string) =>
   new Promise((resolve, reject) => {
     try {
-      const data = fs.readFileSync(svgPath)
-      resolve(data.toString())
+      const pathData = readFileSync(svgPath)
+      resolve(pathData.toString())
     } catch (err) {
       reject(err)
     }
   })
 
-let sourceIndex: number
+let sourceIndex!: number
 process.argv.forEach((item: string, index: number) => {
   item.substring(2) === 'source' && (sourceIndex = index)
 })
@@ -47,115 +48,68 @@ getSvgData(svgPath).then((svgData: string) => {
   })
 })
 
-const svgo = require('svgo')
 const filepath = path.resolve(__dirname, '../nodejs-icon.svg')
-const config = {
-  plugins: [
-    'cleanupAttrs',
-    'removeDoctype',
-    'removeXMLProcInst',
-    'removeComments',
-    'removeMetadata',
-    'removeTitle',
-    'removeDesc',
-    'removeUselessDefs',
-    'removeEditorsNSData',
-    'removeEmptyAttrs',
-    'removeHiddenElems',
-    'removeEmptyText',
-    'removeEmptyContainers',
-    // 'removeViewBox',
-    'removeXMLNS',
-    'removePreserveAspectRatio',
-    'cleanupEnableBackground',
-    'convertStyleToAttrs',
-    'convertColors',
-    'convertPathData',
-    'convertTransform',
-    'removeUnknownsAndDefaults',
-    'removeNonInheritableGroupAttrs',
-    'removeUselessStrokeAndFill',
-    'removeUnusedNS',
-    'cleanupIDs',
-    'cleanupNumericValues',
-    'moveElemsAttrsToGroup',
-    'moveGroupAttrsToElems',
-    'collapseGroups',
-    // 'removeRasterImages',
-    'mergePaths',
-    'convertShapeToPath',
-    'sortAttrs',
-    'removeDimensions',
-    { name: 'removeAttrs', attrs: '(stroke|fill|preserveAspectRatio)' }
-  ]
-}
-
-fs.readFile(filepath, 'utf8', function (err, data) {
-  if (err) {
-    throw err
+const getOptimizeData = () => {
+  const optimizeOptions: OptimizeOptions = {
+    plugins: [
+      'cleanupAttrs',
+      'removeDoctype',
+      'removeXMLProcInst',
+      'removeComments',
+      'removeMetadata',
+      'removeTitle',
+      'removeDesc',
+      'removeUselessDefs',
+      'removeEditorsNSData',
+      'removeEmptyAttrs',
+      'removeHiddenElems',
+      'removeEmptyText',
+      'removeEmptyContainers',
+      // 'removeViewBox',
+      'removeXMLNS',
+      // 'removePreserveAspectRatio',
+      'cleanupEnableBackground',
+      'convertStyleToAttrs',
+      'convertColors',
+      'convertPathData',
+      'convertTransform',
+      'removeUnknownsAndDefaults',
+      'removeNonInheritableGroupAttrs',
+      'removeUselessStrokeAndFill',
+      'removeUnusedNS',
+      'cleanupIDs',
+      'cleanupNumericValues',
+      'moveElemsAttrsToGroup',
+      'moveGroupAttrsToElems',
+      'collapseGroups',
+      // 'removeRasterImages',
+      'mergePaths',
+      'convertShapeToPath',
+      'sortAttrs',
+      'removeDimensions'
+      // { name: 'removeAttrs', attrs: '(stroke|fill|preserveAspectRatio)' }
+    ]
   }
-
-  const result = svgo.optimize(data, { path: filepath, ...config })
-
-  console.log(result)
-})
-
-/**
- * Promise all
- * @author Loreto Parisi (loretoparisi at gmail dot com)
- */
-function promiseAllP(items, block) {
-  var promises = []
-  items.forEach(function (item, index) {
-    promises.push(
-      ((item, _i) => {
-        return new Promise((resolve, reject) => {
-          return block.apply(this, [item, index, resolve, reject])
-        })
-      })(item, index)
-    )
-  })
-  return Promise.all(promises)
-}
-
-/**
- * read files
- * @param dirname string
- * @return Promise
- * @author Loreto Parisi (loretoparisi at gmail dot com)
- *
- */
-function readFiles(dirname) {
-  return new Promise((resolve, reject) => {
-    fs.readdir(dirname, function (err, filenames) {
-      if (err) return reject(err)
-      promiseAllP(filenames, (filename, index, resolve, reject) => {
-        console.log()
-        fs.readFile(path.resolve(dirname, filename), 'utf-8', function (err, content) {
-          if (err) return reject(err)
-          return resolve({ filename, content })
-        })
-      })
-        .then((results) => {
-          return resolve(results)
-        })
-        .catch((error) => {
-          return reject(error)
-        })
-    })
-  })
-}
-
-readFiles(path.resolve(__dirname, '../assets'))
-  .then((files: [{ filename: string; content: string }]) => {
-    console.log('loaded ', files.length)
-    files.forEach((item, index) => {
-      console.log('index: ', index, 'filename: ', item.filename, 'content: ', item.content)
-    })
-  })
-  .catch((error) => {
+  try {
+    const svgString = readFileSync(filepath, 'utf8')
+    return optimize(svgString, { path: filepath, plugins: optimizeOptions.plugins })
+  } catch (error) {
     console.log(error)
-  })
+  }
+}
+
+(async () => await getOptimizeData() )()
+
+const assetsPath = path.resolve(__dirname, '../assets')
+
+const files = readdirSync(assetsPath)
+
+for (const file of files) {
+  const stat = lstatSync(path.join(assetsPath, file))
+  if (stat.isFile()) {
+    console.log(readFileSync(path.join(assetsPath, file), 'utf-8'))
+  }
+}
 
 // const svgstore = require('svgstore')
 // const sprites = svgstore()
