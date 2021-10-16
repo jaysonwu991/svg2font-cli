@@ -1,41 +1,41 @@
-import path from 'path'
-import svgpath from 'svgpath'
-import { optimize, OptimizeOptions } from 'svgo'
-import { lstatSync, readdirSync, readFileSync } from 'fs'
+import path from 'path';
+import svgpath from 'svgpath';
+import { optimize, OptimizeOptions } from 'svgo';
+import { lstatSync, readdirSync, readFileSync } from 'fs';
 
 const getSvgPath = (target: string) => {
-  let matched
-  let result!: string[]
-  const regx = /d="(.*?)"/g
+  let matched;
+  let result!: string[];
+  const regx = /d="(.*?)"/g;
   while ((matched = regx.exec(target))) {
-    result.push(matched[1])
+    result.push(matched[1]);
   }
 
-  return result
-}
+  return result;
+};
 
 const getSvgData: any = (svgPath: string) =>
   new Promise((resolve, reject) => {
     try {
-      const pathData = readFileSync(svgPath)
-      resolve(pathData.toString())
+      const pathData = readFileSync(svgPath);
+      resolve(pathData.toString());
     } catch (err) {
-      reject(err)
+      reject(err);
     }
-  })
+  });
 
-let sourceIndex!: number
+let sourceIndex!: number;
 process.argv.forEach((item: string, index: number) => {
-  item.substring(2) === 'source' && (sourceIndex = index)
-})
+  item.substring(2) === 'source' && (sourceIndex = index);
+});
 
-const svgPath: string = process.argv[sourceIndex + 1]
-let sourceData: string
+const svgPath: string = process.argv[sourceIndex + 1];
+let sourceData: string;
 getSvgData(svgPath).then((svgData: string) => {
-  sourceData = svgData
+  sourceData = svgData;
   // TODO: Optimize Source Data
   // TODO: Get ViewBox Data
-  const pathArr = getSvgPath(sourceData)
+  const pathArr = getSvgPath(sourceData);
   // console.log('pathArr: ', pathArr)
   pathArr.forEach((path: string, pathIndex: number) => {
     console.log(
@@ -44,11 +44,11 @@ getSvgData(svgPath).then((svgData: string) => {
         .scale(1024 / 282)
         .round(6)
         .toString()}`
-    )
-  })
-})
+    );
+  });
+});
 
-const filepath = path.resolve(__dirname, '../nodejs-icon.svg')
+const filepath = path.resolve(__dirname, '../nodejs-icon.svg');
 const getOptimizeData = () => {
   const optimizeOptions: OptimizeOptions = {
     plugins: [
@@ -86,28 +86,28 @@ const getOptimizeData = () => {
       'mergePaths',
       'convertShapeToPath',
       'sortAttrs',
-      'removeDimensions'
+      'removeDimensions',
       // { name: 'removeAttrs', attrs: '(stroke|fill|preserveAspectRatio)' }
-    ]
-  }
+    ],
+  };
   try {
-    const svgString = readFileSync(filepath, 'utf8')
-    return optimize(svgString, { path: filepath, plugins: optimizeOptions.plugins })
+    const svgString = readFileSync(filepath, 'utf8');
+    return optimize(svgString, { path: filepath, plugins: optimizeOptions.plugins });
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
-}
+};
 
-(async () => await getOptimizeData() )()
+(async () => await getOptimizeData() )();
 
-const assetsPath = path.resolve(__dirname, '../assets')
+const assetsPath = path.resolve(__dirname, '../assets');
 
-const files = readdirSync(assetsPath)
+const files = readdirSync(assetsPath);
 
 for (const file of files) {
-  const stat = lstatSync(path.join(assetsPath, file))
+  const stat = lstatSync(path.join(assetsPath, file));
   if (stat.isFile()) {
-    console.log(readFileSync(path.join(assetsPath, file), 'utf-8'))
+    console.log(readFileSync(path.join(assetsPath, file), 'utf-8'));
   }
 }
 
