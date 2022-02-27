@@ -1,7 +1,25 @@
 import path from 'path';
 import svgpath from 'svgpath';
+import fastGlob from 'fast-glob';
 import { optimize, OptimizeOptions } from 'svgo';
 import { lstatSync, readdirSync, readFileSync } from 'fs';
+
+const workers: number = 7;
+const filePatterns: string = '*.svg';
+
+(async () => await fastGlob(filePatterns, {
+  dot: true,
+  unique: true,
+  absolute: true,
+  onlyFiles: true,
+  concurrency: workers,
+  // followSymlinkedDirectories: false,
+  ignore: [
+    '**/.eslintrc*',
+    '**/.git/**/*',
+    '**/node_modules/**/*',
+  ],
+}))();
 
 const getSvgPath = (target: string) => {
   let matched;
@@ -87,7 +105,7 @@ const getOptimizeData = () => {
       'convertShapeToPath',
       'sortAttrs',
       'removeDimensions',
-      // { name: 'removeAttrs', attrs: '(stroke|fill|preserveAspectRatio)' }
+      // { name: 'removeAttrs', attrs: '(stroke|fill|preserveAspectRatio)' },
     ],
   };
   try {
@@ -97,8 +115,6 @@ const getOptimizeData = () => {
     console.log(error);
   }
 };
-
-(async () => await getOptimizeData() )();
 
 const assetsPath = path.resolve(__dirname, '../assets');
 
