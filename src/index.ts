@@ -1,134 +1,18 @@
-import path from 'path';
-import svgpath from 'svgpath';
-import fastGlob from 'fast-glob';
-import { optimize, OptimizeOptions } from 'svgo';
-import { lstatSync, readdirSync, readFileSync } from 'fs';
-
-const workers: number = 7;
-const filePatterns: string = '*.svg';
-
-(async () => await fastGlob(filePatterns, {
-  dot: true,
-  unique: true,
-  absolute: true,
-  onlyFiles: true,
-  concurrency: workers,
-  // followSymlinkedDirectories: false,
-  ignore: [
-    '**/.eslintrc*',
-    '**/.git/**/*',
-    '**/node_modules/**/*',
-  ],
-}))();
-
-const getSvgPath = (target: string) => {
-  let matched;
-  let result!: string[];
-  const regx = /d="(.*?)"/g;
-  while ((matched = regx.exec(target))) {
-    result.push(matched[1]);
-  }
-
-  return result;
-};
-
-const getSvgData: any = (svgPath: string) =>
-  new Promise((resolve, reject) => {
-    try {
-      const pathData = readFileSync(svgPath);
-      resolve(pathData.toString());
-    } catch (err) {
-      reject(err);
-    }
-  });
-
-let sourceIndex!: number;
-process.argv.forEach((item: string, index: number) => {
-  item.substring(2) === 'source' && (sourceIndex = index);
-});
-
-const svgPath: string = process.argv[sourceIndex + 1];
-let sourceData: string;
-getSvgData(svgPath).then((svgData: string) => {
-  sourceData = svgData;
-  // TODO: Optimize Source Data
-  // TODO: Get ViewBox Data
-  const pathArr = getSvgPath(sourceData);
-  // console.log('pathArr: ', pathArr)
-  pathArr.forEach((path: string, pathIndex: number) => {
-    console.log(
-      `path ${pathIndex}: ${svgpath(path)
-        .translate((282 - 256) / 2)
-        .scale(1024 / 282)
-        .round(6)
-        .toString()}`
-    );
-  });
-});
-
-const filepath = path.resolve(__dirname, '../nodejs-icon.svg');
-const getOptimizeData = () => {
-  const optimizeOptions: OptimizeOptions = {
-    plugins: [
-      'cleanupAttrs',
-      'removeDoctype',
-      'removeXMLProcInst',
-      'removeComments',
-      'removeMetadata',
-      'removeTitle',
-      'removeDesc',
-      'removeUselessDefs',
-      'removeEditorsNSData',
-      'removeEmptyAttrs',
-      'removeHiddenElems',
-      'removeEmptyText',
-      'removeEmptyContainers',
-      // 'removeViewBox',
-      'removeXMLNS',
-      // 'removePreserveAspectRatio',
-      'cleanupEnableBackground',
-      'convertStyleToAttrs',
-      'convertColors',
-      'convertPathData',
-      'convertTransform',
-      'removeUnknownsAndDefaults',
-      'removeNonInheritableGroupAttrs',
-      'removeUselessStrokeAndFill',
-      'removeUnusedNS',
-      'cleanupIDs',
-      'cleanupNumericValues',
-      'moveElemsAttrsToGroup',
-      'moveGroupAttrsToElems',
-      'collapseGroups',
-      // 'removeRasterImages',
-      'mergePaths',
-      'convertShapeToPath',
-      'sortAttrs',
-      'removeDimensions',
-      // { name: 'removeAttrs', attrs: '(stroke|fill|preserveAspectRatio)' },
-    ],
-  };
-  try {
-    const svgString = readFileSync(filepath, 'utf8');
-    return optimize(svgString, { path: filepath, plugins: optimizeOptions.plugins });
-  } catch (error) {
-    console.log(error);
-  }
-};
-
-const assetsPath = path.resolve(__dirname, '../assets');
-
-const files = readdirSync(assetsPath);
-
-for (const file of files) {
-  const stat = lstatSync(path.join(assetsPath, file));
-  if (stat.isFile()) {
-    console.log(readFileSync(path.join(assetsPath, file), 'utf-8'));
-  }
-}
-
-// const svgstore = require('svgstore')
-// const sprites = svgstore()
-//     .add('unicorn', fs.readFileSync('./assets/nodejs-icon.svg', 'utf8'))
-//     .add('rainbow', fs.readFileSync('./assets/nodejs-icon.svg', 'utf8'))
-// fs.writeFileSync('./fonts/sprites.svg', sprites)
+export { generateIconfont } from "./core/generate";
+export { loadIcons, sanitizeName, toAbsolutePattern } from "./core/icons";
+export { addCodepoints } from "./core/glyphs";
+export { createSprite } from "./core/sprite";
+export { createSvgFont, extractPaths, extractViewBox } from "./core/svg-font";
+export { ZipArchive } from "./core/zip";
+export {
+  DEFAULT_CLASS_PREFIX,
+  DEFAULT_CLI_OPTIONS,
+  DEFAULT_CODEPOINT_START,
+  DEFAULT_FONT_NAME,
+  DEFAULT_INPUT,
+  DEFAULT_OPTIMIZE,
+  DEFAULT_OUTPUT,
+  resolveGenerateOptions,
+} from "./defaults";
+export type { ResolvedGenerateOptions } from "./defaults";
+export * from "./types";
