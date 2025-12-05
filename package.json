@@ -1,7 +1,7 @@
 {
   "name": "svg2font-cli",
-  "version": "0.0.1",
-  "description": "A SVG To Iconfont Project, Just Use Command Line",
+  "version": "1.0.0",
+  "description": "CLI and Node API to turn SVG icon sets into downloadable iconfont bundles (SVG/TTF/WOFF/WOFF2/EOT) with demo assets.",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "bin": {
@@ -11,7 +11,7 @@
   "packageManager": "pnpm@10.24.0",
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "build": "pnpm clean && vite build --mode lib && vite build --mode cli && tsc -p tsconfig.json --emitDeclarationOnly",
+    "build": "pnpm clean && pnpm build:js && pnpm build:types",
     "build:js": "vite build --mode lib && vite build --mode cli",
     "build:types": "tsc -p tsconfig.json --emitDeclarationOnly",
     "clean": "rm -rf lib",
@@ -26,8 +26,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com:jayson991/svg2font-cli.git"
+    "url": "https://github.com/jaysonwu991/svg2font-cli"
   },
+  "homepage": "https://github.com/jaysonwu991/svg2font-cli#readme",
+  "bugs": "https://github.com/jaysonwu991/svg2font-cli/issues",
   "keywords": [
     "svg",
     "font",
@@ -35,10 +37,11 @@
     "svg2font-cli"
   ],
   "author": "Jayson Wu <jaysonwu991@outlook.com>",
-  "license": "ISC",
+  "license": "MIT",
   "files": [
     "lib"
   ],
+  "sideEffects": false,
   "exports": {
     ".": {
       "types": "./lib/index.d.ts",
