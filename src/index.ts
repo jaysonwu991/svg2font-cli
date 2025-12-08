@@ -2,7 +2,15 @@ export { generateIconfont } from "./core/generate";
 export { loadIcons, sanitizeName, toAbsolutePattern } from "./core/icons";
 export { addCodepoints } from "./core/glyphs";
 export { createSprite } from "./core/sprite";
-export { createSvgFont, extractPaths, extractViewBox } from "./core/svg-font";
+export {
+  DEFAULT_ASCENT,
+  DEFAULT_DESCENT,
+  DEFAULT_UNITS_PER_EM,
+  createSvgFont,
+  extractPaths,
+  extractViewBox,
+  normalizeSvgPaths,
+} from "./core/svg-font";
 export { ZipArchive } from "./core/zip";
 export {
   DEFAULT_CLASS_PREFIX,

@@ -1,5 +1,10 @@
 import { deflateSync } from "zlib";
-import { extractPaths, extractViewBox } from "../core/svg-font";
+import {
+  DEFAULT_ASCENT,
+  DEFAULT_DESCENT,
+  DEFAULT_UNITS_PER_EM,
+  normalizeSvgPaths,
+} from "../core/svg-font";
 import { GlyphMeta } from "../types";
 import SvgPath from "./svg-path";
 
@@ -7,9 +12,6 @@ type SfntName = { id: number; value: string };
 type TtfPoint = { x: number; y: number; onCurve: boolean };
 type TtfContour = TtfPoint[];
 
-const DEFAULT_UNITS_PER_EM = 1000;
-const DEFAULT_ASCENT = 850;
-const DEFAULT_DESCENT = -150;
 const VERSION_RE = /^(Version )?(\d+[.]\d+)$/i;
 const toInt = (value: number): number => Math.trunc(value);
 type Vec = { x: number; y: number };
@@ -646,7 +648,81 @@ const toSfntContours = (path: any): TtfContour[] => {
   return resContours;
 };
 
-const pathToContours = (pathData: string, glyphSize: number): Contour[] => {
+const pointInPolygon = (point: { x: number; y: number }, contour: TtfContour): boolean => {
+  const polygon = contour.filter((p) => p.onCurve);
+  const points = polygon.length >= 3 ? polygon : contour;
+  if (points.length < 3) return false;
+
+  let inside = false;
+  for (let i = 0, j = points.length - 1; i < points.length; j = i, i++) {
+    const pi = points[i];
+    const pj = points[j];
+    const intersects =
+      pi.y > point.y !== pj.y > point.y &&
+      point.x <
+        ((pj.x - pi.x) * (point.y - pi.y)) / (pj.y - pi.y + Number.EPSILON) + pi.x;
+    if (intersects) inside = !inside;
+  }
+  return inside;
+};
+
+const signedArea = (contour: TtfContour): number => {
+  let area = 0;
+  const pts = contour.filter((p) => p.onCurve);
+  const points = pts.length >= 3 ? pts : contour;
+  if (points.length < 3) return 0;
+
+  for (let i = 0, j = points.length - 1; i < points.length; j = i, i++) {
+    area += points[j].x * points[i].y - points[i].x * points[j].y;
+  }
+  return area / 2;
+};
+
+const ensureOrientation = (contour: TtfContour, clockwise: boolean): TtfContour => {
+  const area = signedArea(contour);
+  const isClockwise = area < 0;
+  if (clockwise === isClockwise) return contour;
+  const reversed = [...contour].reverse();
+  return reversed;
+};
+
+type ContourMeta = { contour: TtfContour; forceHole: boolean };
+
+const orientContoursEvenOdd = (contours: ContourMeta[]): TtfContour[] => {
+  const depthInfo = contours.map((entry, idx) => {
+    const sample = entry.contour.find((p) => p.onCurve) ?? entry.contour[0];
+    if (!sample) return { parityDepth: 0, filledDepth: 0 };
+    let parityDepth = 0;
+    let filledDepth = 0;
+
+    contours.forEach((other, otherIdx) => {
+      if (otherIdx === idx) return;
+      if (pointInPolygon(sample, other.contour)) {
+        parityDepth++;
+        if (!other.forceHole) filledDepth++;
+      }
+    });
+
+    return { parityDepth, filledDepth };
+  });
+
+  const expanded: ContourMeta[] = [];
+
+  contours.forEach((entry, idx) => {
+    const { parityDepth, filledDepth } = depthInfo[idx];
+    const copies = entry.forceHole ? Math.max(filledDepth, 1) : 1;
+    for (let i = 0; i < copies; i++) {
+      const parityHole = parityDepth % 2 === 1;
+      const isHole = entry.forceHole || parityHole;
+      const wantClockwise = isHole;
+      expanded.push({ contour: ensureOrientation(entry.contour, wantClockwise), forceHole: isHole });
+    }
+  });
+
+  return expanded.map((entry) => entry.contour);
+};
+
+const pathToContours = (pathData: string, glyphSize: number): TtfContour[] => {
   if (!pathData) return [];
 
   const accuracy = glyphSize > 500 ? 0.3 : glyphSize * 0.0006;
@@ -658,33 +734,25 @@ const pathToContours = (pathData: string, glyphSize: number): Contour[] => {
       cubicToQuad(segment, index, x, y, accuracy),
     );
 
-  const sfntContours = toSfntContours(svgPath);
-  return sfntContours.map((ctr) => {
-    const contour = new Contour();
-    contour.points = ctr.map((pt) => ({ x: pt.x, y: pt.y, onCurve: pt.onCurve }));
-    return contour;
-  });
-};
-
-const combinePaths = (svg: string): string => {
-  const paths = extractPaths(svg);
-  return paths.join(" ").trim();
+  return toSfntContours(svgPath);
 };
 
 const sanitizePostscriptName = (value: string): string =>
   value.replace(/[\s()[\]<>%/]/g, "").slice(0, 62);
 
+const isWhiteFill = (fill?: string): boolean => {
+  if (!fill) return false;
+  const lower = fill.trim().toLowerCase();
+  return lower === "#fff" || lower === "#ffffff" || lower === "white" || lower === "rgb(255,255,255)";
+};
+
 const buildFontFromGlyphs = (
   glyphs: GlyphMeta[],
   fontName: string,
+  unitsPerEm: number = DEFAULT_UNITS_PER_EM,
   versionString = "Version 1.0",
 ): Font => {
   const font = new Font();
-  const viewBox = glyphs.length
-    ? extractViewBox(glyphs[0].svg)
-    : { width: DEFAULT_UNITS_PER_EM, height: DEFAULT_UNITS_PER_EM };
-  const unitsPerEm = viewBox.height || DEFAULT_UNITS_PER_EM;
-
   font.id = fontName;
   font.familyName = fontName;
   font.unitsPerEm = unitsPerEm;
@@ -716,8 +784,22 @@ const buildFontFromGlyphs = (
     glyph.unicode = glyphMeta.codepoint;
     glyph.width = unitsPerEm;
     glyph.height = unitsPerEm;
-    glyph.d = combinePaths(glyphMeta.svg);
-    glyph.contours = pathToContours(glyph.d, Math.max(glyph.width, glyph.height));
+    const normalized = normalizeSvgPaths(glyphMeta.svg, unitsPerEm);
+    glyph.d = normalized.d;
+
+    const contoursWithMeta: ContourMeta[] = [];
+    normalized.paths.forEach((path) => {
+      const pathContours = pathToContours(path.d, unitsPerEm);
+      const forceHole = isWhiteFill(path.fill);
+      pathContours.forEach((ctr) => contoursWithMeta.push({ contour: ctr, forceHole }));
+    });
+
+    const orientedContours = orientContoursEvenOdd(contoursWithMeta);
+    glyph.contours = orientedContours.map((ctr) => {
+      const contour = new Contour();
+      contour.points = ctr.map((pt) => ({ x: pt.x, y: pt.y, onCurve: pt.onCurve }));
+      return contour;
+    });
     font.glyphs.push(glyph);
     if (!font.codePoints[glyphMeta.codepoint]) {
       font.codePoints[glyphMeta.codepoint] = glyph;
@@ -1885,7 +1967,11 @@ export const ttfToEot = (arr: Uint8Array): Buffer => {
   return eot;
 };
 
-export const svgToTtf = (glyphs: GlyphMeta[], fontName: string): Buffer => {
-  const font = buildFontFromGlyphs(glyphs, fontName);
+export const svgToTtf = (
+  glyphs: GlyphMeta[],
+  fontName: string,
+  unitsPerEm: number = DEFAULT_UNITS_PER_EM,
+): Buffer => {
+  const font = buildFontFromGlyphs(glyphs, fontName, unitsPerEm);
   return generateTtf(font);
 };

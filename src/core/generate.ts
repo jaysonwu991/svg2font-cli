@@ -5,7 +5,7 @@ import { resolveGenerateOptions } from "../defaults";
 import { GenerateOptions, GenerateResult, GlyphMeta } from "../types";
 import { addCodepoints } from "./glyphs";
 import { createSprite } from "./sprite";
-import { createSvgFont } from "./svg-font";
+import { DEFAULT_UNITS_PER_EM, createSvgFont } from "./svg-font";
 import { loadIcons, toAbsolutePattern } from "./icons";
 import { ZipArchive } from "./zip";
 import { svgToTtf, ttfToEot, ttfToWoff } from "../internal/font-converter";
@@ -70,9 +70,10 @@ export const generateIconfont = async (options: GenerateOptions): Promise<Genera
   const pattern = await toAbsolutePattern(resolved.input);
   const icons = await loadIcons(pattern, resolved.optimize);
   const glyphs = addCodepoints(icons, resolved.codepointStart);
-  const svgFont = await createSvgFont(glyphs, resolved.name);
+  const unitsPerEm = DEFAULT_UNITS_PER_EM;
+  const svgFont = createSvgFont(glyphs, resolved.name, unitsPerEm);
 
-  const ttf = toBuffer(svgToTtf(glyphs, resolved.name));
+  const ttf = toBuffer(svgToTtf(glyphs, resolved.name, unitsPerEm));
   const woff = toBuffer(ttfToWoff(new Uint8Array(ttf)));
   const woff2 = toBuffer(ttfToWoff2(new Uint8Array(ttf)));
   const eot = toBuffer(ttfToEot(new Uint8Array(ttf)));
