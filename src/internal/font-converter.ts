@@ -659,8 +659,7 @@ const pointInPolygon = (point: { x: number; y: number }, contour: TtfContour): b
     const pj = points[j];
     const intersects =
       pi.y > point.y !== pj.y > point.y &&
-      point.x <
-        ((pj.x - pi.x) * (point.y - pi.y)) / (pj.y - pi.y + Number.EPSILON) + pi.x;
+      point.x < ((pj.x - pi.x) * (point.y - pi.y)) / (pj.y - pi.y + Number.EPSILON) + pi.x;
     if (intersects) inside = !inside;
   }
   return inside;
@@ -682,44 +681,40 @@ const ensureOrientation = (contour: TtfContour, clockwise: boolean): TtfContour 
   const area = signedArea(contour);
   const isClockwise = area < 0;
   if (clockwise === isClockwise) return contour;
-  const reversed = [...contour].reverse();
-  return reversed;
+  return [...contour].reverse();
 };
 
 type ContourMeta = { contour: TtfContour; forceHole: boolean };
 
 const orientContoursEvenOdd = (contours: ContourMeta[]): TtfContour[] => {
-  const depthInfo = contours.map((entry, idx) => {
+  const depths = contours.map((entry, idx) => {
     const sample = entry.contour.find((p) => p.onCurve) ?? entry.contour[0];
-    if (!sample) return { parityDepth: 0, filledDepth: 0 };
-    let parityDepth = 0;
-    let filledDepth = 0;
-
+    if (!sample) return { parity: 0, filled: 0 };
+    let parity = 0;
+    let filled = 0;
     contours.forEach((other, otherIdx) => {
       if (otherIdx === idx) return;
       if (pointInPolygon(sample, other.contour)) {
-        parityDepth++;
-        if (!other.forceHole) filledDepth++;
+        parity++;
+        if (!other.forceHole) filled++;
       }
     });
-
-    return { parityDepth, filledDepth };
+    return { parity, filled };
   });
 
-  const expanded: ContourMeta[] = [];
+  const expanded: TtfContour[] = [];
 
   contours.forEach((entry, idx) => {
-    const { parityDepth, filledDepth } = depthInfo[idx];
-    const copies = entry.forceHole ? Math.max(filledDepth, 1) : 1;
+    const { parity, filled } = depths[idx];
+    const baseIsHole = entry.forceHole || parity % 2 === 1;
+    const copies = entry.forceHole ? Math.max(filled, 1) : 1;
     for (let i = 0; i < copies; i++) {
-      const parityHole = parityDepth % 2 === 1;
-      const isHole = entry.forceHole || parityHole;
-      const wantClockwise = isHole;
-      expanded.push({ contour: ensureOrientation(entry.contour, wantClockwise), forceHole: isHole });
+      const wantClockwise = !baseIsHole; // outer = CW, hole = CCW
+      expanded.push(ensureOrientation(entry.contour, wantClockwise));
     }
   });
 
-  return expanded.map((entry) => entry.contour);
+  return expanded;
 };
 
 const pathToContours = (pathData: string, glyphSize: number): TtfContour[] => {
@@ -743,7 +738,9 @@ const sanitizePostscriptName = (value: string): string =>
 const isWhiteFill = (fill?: string): boolean => {
   if (!fill) return false;
   const lower = fill.trim().toLowerCase();
-  return lower === "#fff" || lower === "#ffffff" || lower === "white" || lower === "rgb(255,255,255)";
+  return (
+    lower === "#fff" || lower === "#ffffff" || lower === "white" || lower === "rgb(255,255,255)"
+  );
 };
 
 const buildFontFromGlyphs = (
