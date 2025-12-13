@@ -30,7 +30,8 @@ export const sanitizeName = (value: string): string =>
     .trim()
     .replace(/\s+/g, "-")
     .replace(/[^a-zA-Z0-9_-]/g, "-")
-    .replace(/-{2,}/g, "-");
+    .replace(/-{2,}/g, "-")
+    .toLowerCase();
 
 export const toAbsolutePattern = async (input: string): Promise<string> => {
   const absoluteInput = path.isAbsolute(input) ? input : path.resolve(process.cwd(), input);

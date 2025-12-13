@@ -6,6 +6,6 @@ export const addCodepoints = (icons: SvgIcon[], start: number): GlyphMeta[] =>
     return {
       ...icon,
       codepoint,
-      unicode: String.fromCharCode(codepoint),
+      unicode: String.fromCodePoint(codepoint),
     };
   });

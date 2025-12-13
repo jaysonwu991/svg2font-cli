@@ -1,6 +1,12 @@
 import path from "path";
 import { promises as fs } from "fs";
-import { buildCss, buildDemoHtml, buildIconfontJs } from "../templates";
+import {
+  buildCss,
+  buildDemoCss,
+  buildDemoHtml,
+  buildIconfontJs,
+  buildIconfontManifest,
+} from "../templates";
 import { resolveGenerateOptions } from "../defaults";
 import { GenerateOptions, GenerateResult, GlyphMeta } from "../types";
 import { addCodepoints } from "./glyphs";
@@ -27,30 +33,52 @@ const buildZip = async (params: {
   woff: Buffer;
   woff2: Buffer;
   eot: Buffer;
+  cacheBust: string;
 }) => {
-  const { fontName, prefix, glyphs, outputDir, svgFont, ttf, woff, woff2, eot } = params;
+  const { fontName, prefix, glyphs, outputDir, svgFont, ttf, woff, woff2, eot, cacheBust } =
+    params;
   const zip = new ZipArchive();
+  const folderName = fontName;
   const fileBase = fontName;
+  const assetPath = (name: string) => `${folderName}/${name}`;
+
   const sprite = createSprite(glyphs, prefix);
-  const css = buildCss({ fontName, prefix, glyphs, fileBase });
+  const css = buildCss({ fontName, prefix, glyphs, fileBase, cacheBust });
+  const cssFile = `${fileBase}.css`;
+  const jsFile = `${fileBase}.js`;
+  const symbolFile = `${fileBase}.symbol.svg`;
+
+  const demoCssFile = "demo.css";
+  const demoHtmlFile = "demo_index.html";
+
+  const demoCss = buildDemoCss();
   const demo = buildDemoHtml({
     fontName,
     prefix,
     glyphs,
-    cssFile: `${fileBase}.css`,
-    jsFile: `${fileBase}.js`,
+    fileBase,
+    cssFile,
+    demoCssFile,
+    jsFile,
+    symbolFile,
+    cacheBust,
+    sprite,
   });
-  const iconfontJs = buildIconfontJs(sprite);
+  const manifest = buildIconfontManifest({ fontName, prefix, glyphs });
+  const iconfontJs = buildIconfontJs(sprite, fontName);
 
-  zip.addFile(`${fileBase}.svg`, svgFont);
-  zip.addFile(`${fileBase}.ttf`, ttf);
-  zip.addFile(`${fileBase}.woff`, woff);
-  zip.addFile(`${fileBase}.woff2`, woff2);
-  zip.addFile(`${fileBase}.eot`, eot);
-  zip.addFile(`${fileBase}.css`, css);
-  zip.addFile(`${fileBase}.js`, iconfontJs);
-  zip.addFile(`${fileBase}.symbol.svg`, sprite);
-  zip.addFile("demo.html", demo);
+  zip.addFile(assetPath(`${fileBase}.svg`), svgFont);
+  zip.addFile(assetPath(`${fileBase}.ttf`), ttf);
+  zip.addFile(assetPath(`${fileBase}.woff`), woff);
+  zip.addFile(assetPath(`${fileBase}.woff2`), woff2);
+  zip.addFile(assetPath(`${fileBase}.eot`), eot);
+  zip.addFile(assetPath(cssFile), css);
+  zip.addFile(assetPath(jsFile), iconfontJs);
+  zip.addFile(assetPath(symbolFile), sprite);
+  zip.addFile(assetPath(demoCssFile), demoCss);
+  zip.addFile(assetPath(demoHtmlFile), demo);
+  zip.addFile(assetPath("demo.html"), demo);
+  zip.addFile(assetPath(`${fileBase}.json`), manifest);
 
   const resolvedOutput = path.isAbsolute(outputDir)
     ? outputDir
@@ -77,6 +105,7 @@ export const generateIconfont = async (options: GenerateOptions): Promise<Genera
   const woff = toBuffer(ttfToWoff(new Uint8Array(ttf)));
   const woff2 = toBuffer(ttfToWoff2(new Uint8Array(ttf)));
   const eot = toBuffer(ttfToEot(new Uint8Array(ttf)));
+  const cacheBust = Date.now().toString();
 
   const { zipPath, zipBuffer } = await buildZip({
     fontName: resolved.name,
@@ -88,6 +117,7 @@ export const generateIconfont = async (options: GenerateOptions): Promise<Genera
     woff,
     woff2,
     eot,
+    cacheBust,
   });
 
   return { zipPath, glyphs, zipBuffer };

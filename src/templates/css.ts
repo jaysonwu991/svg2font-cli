@@ -1,33 +1,39 @@
 import { GlyphMeta } from "../types";
-import { cssCodepoint } from "./shared";
+import { classNameVariants, normalizePrefix } from "../core/names";
+import { buildFontFace, cssCodepoint } from "./shared";
 
 export const buildCss = (params: {
   fontName: string;
   prefix: string;
   glyphs: GlyphMeta[];
   fileBase: string;
+  cacheBust?: string;
 }): string => {
-  const { fontName, prefix, glyphs, fileBase } = params;
+  const { fontName, prefix, glyphs, fileBase, cacheBust } = params;
+
+  const baseSelectors = Array.from(
+    new Set(["iconfont", normalizePrefix(prefix)].filter((value): value is string => Boolean(value))),
+  )
+    .map((cls) => `.${cls}`)
+    .join(", ");
+
   const iconRules = glyphs
     .map(
-      (glyph) => `.${prefix}-${glyph.name}:before { content: "${cssCodepoint(glyph.codepoint)}"; }`,
+      (glyph) => {
+        const selectors = classNameVariants(prefix, glyph.name)
+          .map((name) => `.${name}:before`)
+          .join(", ");
+        return `${selectors} { content: "${cssCodepoint(glyph.codepoint)}"; }`;
+      },
     )
     .join("\n");
 
+  const fontFace = buildFontFace({ fontName, fileBase, cacheBust });
+
   return [
-    "@font-face {",
-    `  font-family: "${fontName}";`,
-    `  src: url("${fileBase}.eot");`,
-    `  src: url("${fileBase}.eot?#iefix") format("embedded-opentype"),`,
-    `       url("${fileBase}.woff2") format("woff2"),`,
-    `       url("${fileBase}.woff") format("woff"),`,
-    `       url("${fileBase}.ttf") format("truetype"),`,
-    `       url("${fileBase}.svg#${fontName}") format("svg");`,
-    "  font-weight: normal;",
-    "  font-style: normal;",
-    "}",
+    fontFace,
     "",
-    `.${prefix} {`,
+    `${baseSelectors} {`,
     `  font-family: "${fontName}" !important;`,
     "  font-size: 16px;",
     "  font-style: normal;",
