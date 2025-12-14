@@ -12,20 +12,20 @@ export const buildCss = (params: {
   const { fontName, prefix, glyphs, fileBase, cacheBust } = params;
 
   const baseSelectors = Array.from(
-    new Set(["iconfont", normalizePrefix(prefix)].filter((value): value is string => Boolean(value))),
+    new Set(
+      ["iconfont", normalizePrefix(prefix)].filter((value): value is string => Boolean(value)),
+    ),
   )
     .map((cls) => `.${cls}`)
     .join(", ");
 
   const iconRules = glyphs
-    .map(
-      (glyph) => {
-        const selectors = classNameVariants(prefix, glyph.name)
-          .map((name) => `.${name}:before`)
-          .join(", ");
-        return `${selectors} { content: "${cssCodepoint(glyph.codepoint)}"; }`;
-      },
-    )
+    .map((glyph) => {
+      const selectors = classNameVariants(prefix, glyph.name)
+        .map((name) => `.${name}:before`)
+        .join(", ");
+      return `${selectors} { content: "${cssCodepoint(glyph.codepoint)}"; }`;
+    })
     .join("\n");
 
   const fontFace = buildFontFace({ fontName, fileBase, cacheBust });

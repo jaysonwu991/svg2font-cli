@@ -3,7 +3,7 @@
 > 🎨 Convert SVG icon sets into complete iconfont bundles (SVG/TTF/WOFF/WOFF2/EOT) with CSS, demos, and sprites
 
 [![npm version](https://img.shields.io/npm/v/svg2font-cli.svg)](https://www.npmjs.com/package/svg2font-cli)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![License: ISC](https://img.shields.io/badge/License-ISC-blue.svg)](https://opensource.org/licenses/ISC)
 [![Node.js Version](https://img.shields.io/node/v/svg2font-cli.svg)](https://nodejs.org/)
 
 A modern, zero-native-dependency CLI and Node.js library that transforms a folder of SVG icons into a professional iconfont bundle, similar to [iconfont.cn](https://www.iconfont.cn/). Built with TypeScript, featuring pure-JS TTF generation without native bindings.
@@ -242,7 +242,7 @@ node lib/cli.js --input ./assets --output ./dist
 
 ## 📄 License
 
-MIT © [Jayson Wu](https://github.com/jaysonwu991)
+ISC © [Jayson Wu](https://github.com/jaysonwu991)
 
 ## 🤝 Contributing
 

@@ -5,7 +5,8 @@ const versioned = (fileBase: string, ext: string, cacheBust?: string): string =>
   return `${fileBase}.${ext}${query}`;
 };
 
-export const cssCodepoint = (codepoint: number): string => `\\${hexCode(codepoint).padStart(4, "0")}`;
+export const cssCodepoint = (codepoint: number): string =>
+  `\\${hexCode(codepoint).padStart(4, "0")}`;
 
 export const unicodeEntity = (codepoint: number): string => `&#x${hexCode(codepoint)};`;
 
@@ -29,7 +30,9 @@ export const buildFontFace = (params: {
     includeEot
       ? `  src: url("${eot}?#iefix") format("embedded-opentype"),`
       : `  src: url("${woff2}") format("woff2"),`,
-    includeEot ? `       url("${woff2}") format("woff2"),` : `       url("${woff}") format("woff"),`,
+    includeEot
+      ? `       url("${woff2}") format("woff2"),`
+      : `       url("${woff}") format("woff"),`,
     includeEot
       ? `       url("${woff}") format("woff"),`
       : `       url("${ttf}") format("truetype"),`,

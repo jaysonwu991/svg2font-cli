@@ -1,6 +1,9 @@
-import SvgPath from "../lib/svg-path-parser";
+import SvgPath from "../utils/font/svg-path-parser";
 import { GlyphMeta } from "../types";
-import { extractAttr, extractViewBox as extractViewBoxUtil, ViewBoxInfo } from "../utils/svg-helpers";
+import {
+  extractViewBox as extractViewBoxUtil,
+  ViewBoxInfo,
+} from "../utils/svg-helpers";
 
 export const DEFAULT_UNITS_PER_EM = 1024;
 export const DEFAULT_ASCENT = 896;

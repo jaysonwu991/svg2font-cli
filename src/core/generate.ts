@@ -14,8 +14,8 @@ import { createSprite } from "./sprite";
 import { DEFAULT_UNITS_PER_EM, createSvgFont } from "./svg-font-generator";
 import { loadIcons, toAbsolutePattern } from "./icons";
 import { ZipArchive } from "./zip";
-import { svgToTtf, ttfToEot, ttfToWoff } from "../lib/font-converter";
-import { ttfToWoff2 } from "../lib/woff2-converter";
+import { svgToTtf, ttfToEot, ttfToWoff } from "../utils/font/ttf-converter";
+import { ttfToWoff2 } from "../utils/font/woff2-converter";
 
 const toBuffer = (value: ArrayBuffer | Uint8Array | Buffer): Buffer => {
   if (Buffer.isBuffer(value)) return value;
@@ -35,8 +35,7 @@ const buildZip = async (params: {
   eot: Buffer;
   cacheBust: string;
 }) => {
-  const { fontName, prefix, glyphs, outputDir, svgFont, ttf, woff, woff2, eot, cacheBust } =
-    params;
+  const { fontName, prefix, glyphs, outputDir, svgFont, ttf, woff, woff2, eot, cacheBust } = params;
   const zip = new ZipArchive();
   const folderName = fontName;
   const fileBase = fontName;

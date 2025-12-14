@@ -53,8 +53,7 @@ export const buildDemoHtml = (params: {
     symbolFile,
     cacheBust,
     sprite,
-  } =
-    params;
+  } = params;
 
   const versionSuffix = cacheBust ? `?t=${cacheBust}` : "";
   const inlineSprite = sprite.replace(
@@ -67,7 +66,9 @@ export const buildDemoHtml = (params: {
   const symbolHref = `${symbolFile}${versionSuffix}`;
 
   const baseClasses = Array.from(
-    new Set(["iconfont", normalizePrefix(prefix)].filter((value): value is string => Boolean(value))),
+    new Set(
+      ["iconfont", normalizePrefix(prefix)].filter((value): value is string => Boolean(value)),
+    ),
   );
   const baseSelector = baseClasses.map((cls) => `.${cls}`).join(", ");
 
@@ -113,8 +114,15 @@ export const buildDemoHtml = (params: {
       const variants = classNameVariants(prefix, glyph.name);
       const iconClass = variants[0] || glyph.name;
       const altClass = variants[1];
-      const classList = joinClasses(["preview", "iconfont", normalizePrefix(prefix), iconClass, altClass]);
-      const codeName = altClass && altClass !== iconClass ? `.${iconClass} / .${altClass}` : `.${iconClass}`;
+      const classList = joinClasses([
+        "preview",
+        "iconfont",
+        normalizePrefix(prefix),
+        iconClass,
+        altClass,
+      ]);
+      const codeName =
+        altClass && altClass !== iconClass ? `.${iconClass} / .${altClass}` : `.${iconClass}`;
       return `<div class="icon-card">
   <span class="${classList}" aria-hidden="true"></span>
   <span class="name">${glyph.name}</span>

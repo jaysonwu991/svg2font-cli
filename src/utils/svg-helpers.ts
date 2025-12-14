@@ -18,10 +18,7 @@ export const extractAttr = (svg: string, attr: string): string | undefined => {
 /**
  * Extract viewBox information from SVG string
  */
-export const extractViewBox = (
-  svg: string,
-  fallbackSize: number = 1024,
-): ViewBoxInfo => {
+export const extractViewBox = (svg: string, fallbackSize: number = 1024): ViewBoxInfo => {
   const viewBox = extractAttr(svg, "viewBox");
   if (viewBox) {
     const parts = viewBox.split(/\s+/).map((p) => parseFloat(p));

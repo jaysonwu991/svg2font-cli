@@ -1,26 +1,48 @@
+# macOS
 .DS_Store
 
+# Build output
 lib
-assets
-node_modules
-.pnpm-store
-.vscode
-.idea
-coverage
 dist
 build
-.tmp
-.cache
+*.tsbuildinfo
+
+# Dependencies
+node_modules
+.pnpm-store
+
+# Testing
+coverage
 test-assets
 test-output
-.next
-.out
+*.log
+
+# IDE
+.vscode
+.idea
+
+# Environment
 .env
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
+
+# Temporary
+.tmp
+.cache
+*.swp
+*.swo
+*~
+
+# Logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
+pnpm-debug.log*
+
+# Misc
+.next
+.out
+assets
