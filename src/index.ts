@@ -10,7 +10,7 @@ export {
   extractPaths,
   extractViewBox,
   normalizeSvgPaths,
-} from "./core/svg-font";
+} from "./core/svg-font-generator";
 export { ZipArchive } from "./core/zip";
 export {
   DEFAULT_CLASS_PREFIX,

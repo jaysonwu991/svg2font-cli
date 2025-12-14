@@ -11,11 +11,11 @@ import { resolveGenerateOptions } from "../defaults";
 import { GenerateOptions, GenerateResult, GlyphMeta } from "../types";
 import { addCodepoints } from "./glyphs";
 import { createSprite } from "./sprite";
-import { DEFAULT_UNITS_PER_EM, createSvgFont } from "./svg-font";
+import { DEFAULT_UNITS_PER_EM, createSvgFont } from "./svg-font-generator";
 import { loadIcons, toAbsolutePattern } from "./icons";
 import { ZipArchive } from "./zip";
-import { svgToTtf, ttfToEot, ttfToWoff } from "../internal/font-converter";
-import { ttfToWoff2 } from "../internal/woff2";
+import { svgToTtf, ttfToEot, ttfToWoff } from "../lib/font-converter";
+import { ttfToWoff2 } from "../lib/woff2-converter";
 
 const toBuffer = (value: ArrayBuffer | Uint8Array | Buffer): Buffer => {
   if (Buffer.isBuffer(value)) return value;

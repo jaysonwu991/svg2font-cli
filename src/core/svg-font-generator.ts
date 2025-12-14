@@ -1,5 +1,6 @@
-import SvgPath from "../internal/svg-path";
+import SvgPath from "../lib/svg-path-parser";
 import { GlyphMeta } from "../types";
+import { extractAttr, extractViewBox as extractViewBoxUtil, ViewBoxInfo } from "../utils/svg-helpers";
 
 export const DEFAULT_UNITS_PER_EM = 1024;
 export const DEFAULT_ASCENT = 896;
@@ -8,35 +9,11 @@ export const DEFAULT_DESCENT = -128;
 const escapeAttr = (value: string): string =>
   value.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
-const extractAttr = (svg: string, attr: string): string | undefined => {
-  const match =
-    svg.match(new RegExp(`${attr}\\s*=\\s*"([^"]+)"`, "i")) ||
-    svg.match(new RegExp(`${attr}\\s*=\\s*'([^']+)'`, "i"));
-  return match ? match[1] : undefined;
-};
-
-export type ViewBoxInfo = { x: number; y: number; width: number; height: number };
+export type { ViewBoxInfo };
 export type PathEntry = { d: string; fill?: string };
 
-export const extractViewBox = (svg: string): ViewBoxInfo => {
-  const viewBox = extractAttr(svg, "viewBox");
-  if (viewBox) {
-    const parts = viewBox.split(/\s+/).map((p) => parseFloat(p));
-    if (parts.length === 4 && parts.every((n) => Number.isFinite(n))) {
-      return { x: parts[0], y: parts[1], width: parts[2], height: parts[3] };
-    }
-  }
-
-  const width = parseFloat(extractAttr(svg, "width") || "");
-  const height = parseFloat(extractAttr(svg, "height") || "");
-
-  const widthHeight =
-    Number.isFinite(width) && Number.isFinite(height)
-      ? { width, height }
-      : { width: DEFAULT_UNITS_PER_EM, height: DEFAULT_UNITS_PER_EM };
-
-  return { x: 0, y: 0, ...widthHeight };
-};
+export const extractViewBox = (svg: string): ViewBoxInfo =>
+  extractViewBoxUtil(svg, DEFAULT_UNITS_PER_EM);
 
 const extractPathEntries = (svg: string): PathEntry[] => {
   const entries: PathEntry[] = [];

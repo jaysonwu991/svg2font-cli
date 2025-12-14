@@ -1,7 +1,7 @@
 {
   "name": "svg2font-cli",
   "version": "1.0.0",
-  "description": "CLI and Node API to turn SVG icon sets into downloadable iconfont bundles (SVG/TTF/WOFF/WOFF2/EOT) with demo assets.",
+  "description": "CLI and Node API to convert SVG icon sets into complete iconfont bundles (SVG/TTF/WOFF/WOFF2/EOT) with CSS, demos, and sprites - zero native dependencies",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "bin": {
@@ -15,31 +15,50 @@
     "build:js": "vite build --mode lib && vite build --mode cli",
     "build:types": "tsc -p tsconfig.json --emitDeclarationOnly",
     "clean": "rm -rf lib",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest run --coverage",
     "lint": "oxlint --tsconfig tsconfig.json src",
     "lint:fix": "oxlint --fix --tsconfig tsconfig.json src",
     "format": "oxfmt src",
-    "format:check": "oxfmt --check src"
+    "format:check": "oxfmt --check src",
+    "prepublishOnly": "pnpm build && pnpm test"
   },
   "engines": {
-    "node": ">=18.0.0",
-    "pnpm": ">=8.0.0"
+    "node": ">=18.0.0"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/jaysonwu991/svg2font-cli"
+    "url": "git+https://github.com/jaysonwu991/svg2font-cli.git"
   },
   "homepage": "https://github.com/jaysonwu991/svg2font-cli#readme",
-  "bugs": "https://github.com/jaysonwu991/svg2font-cli/issues",
+  "bugs": {
+    "url": "https://github.com/jaysonwu991/svg2font-cli/issues"
+  },
   "keywords": [
     "svg",
     "font",
     "iconfont",
-    "svg2font-cli"
+    "webfont",
+    "icon-font",
+    "svg-to-font",
+    "ttf",
+    "woff",
+    "woff2",
+    "eot",
+    "font-generator",
+    "cli",
+    "typescript",
+    "zero-dependencies"
   ],
   "author": "Jayson Wu <jaysonwu991@outlook.com>",
   "license": "MIT",
   "files": [
-    "lib"
+    "lib",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
   ],
   "sideEffects": false,
   "exports": {
@@ -57,9 +76,12 @@
   },
   "devDependencies": {
     "@types/node": "^24.10.1",
+    "@vitest/ui": "^4.0.15",
+    "happy-dom": "^20.0.11",
     "oxfmt": "^0.16.0",
     "oxlint": "^1.31.0",
     "typescript": "^5.9.3",
-    "vite": "^7.2.6"
+    "vite": "^7.2.6",
+    "vitest": "^4.0.15"
   }
 }

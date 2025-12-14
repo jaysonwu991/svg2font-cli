@@ -1,0 +1,78 @@
+# Source files - only publish built files
+src/
+*.ts
+!*.d.ts
+tsconfig.json
+
+# Build tools and config
+vite.config.ts
+.editorconfig
+.npmrc
+pnpm-workspace.yaml
+pnpm-lock.yaml
+
+# Development files
+.vscode/
+.idea/
+*.log
+*.swp
+*.swo
+*~
+
+# Testing
+test/
+tests/
+*.test.ts
+*.spec.ts
+coverage/
+.nyc_output/
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+.travis.yml
+circle.yml
+
+# Documentation (keep README, CHANGELOG, LICENSE)
+docs/
+*.md
+!README.md
+!CHANGELOG.md
+
+# Examples and assets
+examples/
+assets/
+demo/
+dist/
+*.zip
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+*.sublime-*
+*.code-workspace
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Node
+node_modules/
+
+# Keep only what's needed
+!lib/
+
+# Tests
+test/
+*.test.ts
+*.spec.ts
+vitest.config.ts

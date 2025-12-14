@@ -1,8 +1,4 @@
 .DS_Store
-yarn.lock
-pnpm-lock.yaml
-yarn-error.log
-package-lock.json
 
 lib
 assets
@@ -15,6 +11,8 @@ dist
 build
 .tmp
 .cache
+test-assets
+test-output
 .next
 .out
 .env

@@ -1,6 +1,7 @@
 import { classNameVariants, normalizePrefix } from "../core/names";
 import { GlyphMeta } from "../types";
 import { buildFontFace, unicodeEntity } from "./shared";
+import { extractInnerSvg } from "../utils/svg-helpers";
 
 const escapeHtml = (value: string): string =>
   value
@@ -12,24 +13,6 @@ const escapeHtml = (value: string): string =>
 
 const joinClasses = (classes: (string | undefined)[]): string =>
   classes.filter((cls): cls is string => Boolean(cls)).join(" ");
-
-const extractInnerSvg = (
-  svg: string,
-): { inner: string; viewBox?: string; width?: string; height?: string } => {
-  const svgTagMatch = svg.match(/<svg\b([^>]*)>/i);
-  const svgOpenTag = svgTagMatch?.[0] || "";
-  const attr = (name: string) => {
-    const match =
-      svgOpenTag.match(new RegExp(`${name}\\s*=\\s*"([^"]+)"`, "i")) ||
-      svgOpenTag.match(new RegExp(`${name}\\s*=\\s*'([^']+)'`, "i"));
-    return match ? match[1] : undefined;
-  };
-  const viewBox = attr("viewBox");
-  const width = attr("width");
-  const height = attr("height");
-  const innerMatch = svg.match(/<svg\b[^>]*>([\s\S]*?)<\/svg>/i);
-  return { inner: innerMatch ? innerMatch[1] : svg, viewBox, width, height };
-};
 
 const inlineSymbolSvg = (svg: string, className: string): string => {
   const { inner, viewBox, width, height } = extractInnerSvg(svg);

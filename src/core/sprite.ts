@@ -1,6 +1,6 @@
 import { GlyphMeta } from "../types";
 import { classNameVariants } from "./names";
-import svgstore from "./svgstore";
+import svgstore from "./svg-sprite-store";
 
 export const createSprite = (glyphs: GlyphMeta[], prefix: string): string => {
   const store = svgstore({ inline: true });

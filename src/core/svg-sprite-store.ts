@@ -1,28 +1,8 @@
+import { extractInnerSvg } from "../utils/svg-helpers";
+
 interface SvgstoreOptions {
   inline?: boolean;
 }
-
-const extractAttr = (tag: string, name: string): string | undefined => {
-  const match = tag.match(new RegExp(`${name}\\s*=\\s*["']([^"']+)["']`, "i"));
-  return match ? match[1] : undefined;
-};
-
-const extractInnerSvg = (
-  svg: string,
-): { inner: string; viewBox?: string; width?: string; height?: string } => {
-  const svgTagMatch = svg.match(/<svg\b[^>]*>/i);
-  if (!svgTagMatch) {
-    return { inner: svg };
-  }
-
-  const svgOpenTag = svgTagMatch[0];
-  const viewBox = extractAttr(svgOpenTag, "viewBox");
-  const width = extractAttr(svgOpenTag, "width");
-  const height = extractAttr(svgOpenTag, "height");
-  const innerMatch = svg.match(/<svg\b[^>]*>([\s\S]*?)<\/svg>/i);
-
-  return { inner: innerMatch ? innerMatch[1] : svg, viewBox, width, height };
-};
 
 interface SvgstoreApi {
   add: (id: string, svg: string) => SvgstoreApi;
