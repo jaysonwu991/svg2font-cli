@@ -75,8 +75,7 @@ myicons/
 ├── myicons.symbol.svg   # SVG sprite
 ├── myicons.json         # Glyph metadata manifest
 ├── demo.css             # Demo page styles
-├── demo.html            # Interactive demo page
-└── demo_index.html      # Demo page (alternate)
+└── demo.html            # Interactive demo page
 ```
 
 ## 🎯 Usage Modes
