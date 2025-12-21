@@ -41,32 +41,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 #### Project Structure
 - **Modular Architecture**
-  - `src/lib/` - Low-level font generation
-  - `src/lib/font/` - Focused font modules (buffer, builder, path-conversion)
-  - `src/core/` - Business logic
-  - `src/templates/` - Output generators
+  - `src/cli/` - CLI command setup
+  - `src/core/` - Business logic (generate, icons, glyphs, names, sprite, svg-font-generator, svg-sprite-store, zip)
   - `src/utils/` - Shared utilities
+  - `src/utils/font/` - Font generation modules (ttf-converter, woff2-converter, svg-path-parser, svg-to-ttf-path, binary-writer, ttf-builder)
+  - `src/templates/` - Output generators (css, demo, demo-css, iconfont, manifest, shared)
+  - `src/types.ts` - TypeScript interfaces
+  - `src/defaults.ts` - Configuration constants
 
 - **Code Quality**
   - Eliminated code duplication
   - Clear, descriptive file names
   - Well-organized imports
   - Comprehensive inline documentation
+  - Full test coverage with Vitest
 
 ### Technical Details
 
 #### Pure TypeScript Implementation
 - No native bindings or external font tools
 - Custom implementation of:
-  - TTF binary format generation
-  - WOFF/WOFF2 conversion
+  - TTF binary format generation (10 SFNT tables: OS/2, cmap, glyf, head, hhea, hmtx, loca, maxp, name, post)
+  - WOFF/WOFF2 conversion with compression
+  - EOT format for IE support
   - SVG path parsing and transformation
-  - Glyph contour processing
+  - Glyph contour processing with even-odd fill rule
+  - ZIP archive generation
 
 #### Optimizations
+- Recursive cubic-to-quadratic Bézier curve conversion with tolerance-based subdivision
 - Efficient path simplification algorithms
 - Smart contour orientation detection
-- Minimal file sizes through optimization
+- Collinear point removal
+- Interpolated point optimization
+- Minimal file sizes through compression
 - Fast build times with Vite
 
 ### Dependencies
@@ -79,14 +87,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 #### Development
 - `typescript` (^5.9.3) - Type checking
 - `vite` (^7.2.6) - Build tool
+- `vitest` (^4.0.15) - Test runner with coverage
+- `@vitest/coverage-v8` (4.0.15) - Code coverage
+- `@vitest/ui` (^4.0.15) - Test UI
+- `happy-dom` (^20.0.11) - DOM simulation for tests
 - `oxlint` (^1.31.0) - Fast linting
 - `oxfmt` (^0.16.0) - Code formatting
+- `@types/node` (^24.10.1) - Node.js type definitions
 
 ### Requirements
 - Node.js 18.0.0 or higher
 
 ### License
-MIT
+ISC
 
 ---
 

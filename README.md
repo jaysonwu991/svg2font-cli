@@ -164,20 +164,37 @@ interface GenerateResult {
 svg2font-cli/
 ├── src/
 │   ├── cli/                 # CLI interface
+│   │   └── run.ts          # Command setup
 │   ├── core/                # Business logic
 │   │   ├── generate.ts      # Main orchestrator
-│   │   ├── icons.ts         # SVG loading
+│   │   ├── icons.ts         # SVG loading with SVGO
 │   │   ├── glyphs.ts        # Codepoint assignment
+│   │   ├── names.ts         # CSS class name generation
+│   │   ├── sprite.ts        # SVG sprite creation
 │   │   ├── svg-font-generator.ts
-│   │   └── svg-sprite-store.ts
-│   ├── lib/                 # Low-level font generation
-│   │   ├── font/            # Modular font components
-│   │   ├── font-converter.ts
-│   │   ├── svg-path-parser.ts
-│   │   └── woff2-converter.ts
-│   ├── templates/           # CSS/HTML generators
-│   └── utils/               # Shared utilities
+│   │   ├── svg-sprite-store.ts
+│   │   └── zip.ts           # ZIP archive generation
+│   ├── utils/               # Shared utilities
+│   │   ├── svg-helpers.ts   # SVG parsing
+│   │   └── font/            # Font generation modules
+│   │       ├── ttf-converter.ts    # TTF/WOFF/EOT generation
+│   │       ├── woff2-converter.ts  # WOFF2 generation
+│   │       ├── svg-path-parser.ts  # SVG path parsing
+│   │       ├── svg-to-ttf-path.ts  # Path conversion
+│   │       ├── binary-writer.ts    # Binary utilities
+│   │       └── ttf-builder.ts      # TTF table building
+│   ├── templates/           # CSS/HTML/JS generators
+│   │   ├── css.ts           # Font CSS
+│   │   ├── demo.ts          # Demo HTML
+│   │   ├── demo-css.ts      # Demo styles
+│   │   ├── iconfont.ts      # Sprite loader
+│   │   ├── manifest.ts      # JSON metadata
+│   │   └── shared.ts        # Template helpers
+│   ├── types.ts             # TypeScript interfaces
+│   ├── defaults.ts          # Configuration defaults
+│   └── index.ts             # Main exports
 ├── lib/                     # Built output (gitignored)
+├── test/                    # Test files
 └── package.json
 ```
 
@@ -215,20 +232,27 @@ node lib/cli.js --input ./assets --output ./dist
 
 - `pnpm build` - Clean, build JS bundles, and generate type definitions
 - `pnpm clean` - Remove the `lib/` directory
+- `pnpm test` - Run tests
+- `pnpm test:watch` - Run tests in watch mode
+- `pnpm test:ui` - Run tests with UI
+- `pnpm test:coverage` - Generate coverage report
 - `pnpm lint` - Run oxlint on source files
 - `pnpm lint:fix` - Auto-fix linting issues
 - `pnpm format` - Format code with oxfmt
 - `pnpm format:check` - Check code formatting
+- `pnpm type-check` - Run TypeScript type checking
 
 ## 🔧 Technical Details
 
 ### Pure TypeScript Implementation
 
 - **No Native Dependencies** - Everything runs in pure JavaScript/TypeScript
-- **Custom TTF Generation** - Hand-coded TrueType font table generation
-- **Cubic-to-Quadratic** - Custom Bézier curve conversion algorithm
-- **Path Optimization** - Simplification and interpolation for smaller files
-- **WOFF/WOFF2 Conversion** - Pure JS implementations using zlib/brotli
+- **Custom TTF Generation** - Hand-coded TrueType font table generation (10 SFNT tables)
+- **Cubic-to-Quadratic** - Recursive Bézier curve conversion with tolerance-based subdivision
+- **Path Optimization** - Contour simplification, interpolation, and even-odd fill rule
+- **WOFF/WOFF2 Conversion** - Pure JS implementations using zlib deflate and brotli
+- **EOT Support** - IE compatibility format with proper metadata encoding
+- **Binary Protocol Mastery** - Custom implementations of ZIP, TTF, WOFF, WOFF2, and EOT formats
 
 ### Font Generation Pipeline
 

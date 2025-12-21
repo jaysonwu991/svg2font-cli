@@ -13,7 +13,7 @@ This document outlines the steps to publish `svg2font-cli` to NPM.
 ### 2. Documentation
 - [x] README.md updated with comprehensive docs
 - [x] CHANGELOG.md created with v1.0.0 entry
-- [x] LICENSE file created (MIT)
+- [x] LICENSE file created (ISC)
 - [x] package.json metadata is complete
 
 ### 3. Package Configuration
@@ -38,15 +38,19 @@ The published package will include:
 svg2font-cli-1.0.0.tgz
 ├── lib/                    # Built JavaScript and type definitions
 │   ├── cli.js             # CLI entry point
+│   ├── cli.d.ts           # CLI types
 │   ├── index.js           # Library entry point
-│   ├── core/              # Core modules
-│   ├── lib/               # Low-level font generation
-│   ├── templates/         # Template generators
-│   ├── utils/             # Utilities
-│   └── *.d.ts             # TypeScript definitions
+│   ├── index.d.ts         # Library types
+│   ├── cli/               # CLI modules
+│   ├── core/              # Core modules (generate, icons, glyphs, names, sprite, zip, etc.)
+│   ├── utils/             # Utilities (svg-helpers, font/)
+│   ├── templates/         # Template generators (css, demo, iconfont, manifest, etc.)
+│   ├── types.d.ts         # Type definitions
+│   ├── defaults.d.ts      # Default constants types
+│   └── **/*.d.ts          # TypeScript definitions for all modules
 ├── README.md              # Documentation
 ├── CHANGELOG.md           # Version history
-├── LICENSE                # MIT License
+├── LICENSE                # ISC License
 └── package.json           # Package manifest
 ```
 
@@ -81,26 +85,29 @@ svg2font-cli-1.0.0.tgz
 
 3. **Run a clean build**
    ```bash
-   npm run build
+   pnpm build
    ```
 
 4. **Test the package locally** (optional but recommended)
    ```bash
-   npm pack
+   pnpm pack
    # This creates svg2font-cli-1.0.0.tgz
    # You can test it in another project:
    # npm install /path/to/svg2font-cli-1.0.0.tgz
+   # Or: pnpm add /path/to/svg2font-cli-1.0.0.tgz
    ```
 
 5. **Dry run to see what will be published**
    ```bash
-   npm publish --dry-run
+   pnpm publish --dry-run
    ```
 
 6. **Publish to NPM**
    ```bash
-   npm publish
+   pnpm publish
    ```
+
+   Note: This will automatically run `pnpm build && pnpm test` via the `prepublishOnly` hook.
 
 ### After Publishing
 
@@ -193,10 +200,11 @@ Current package configuration:
 - **Name:** svg2font-cli
 - **Version:** 1.0.0
 - **Size:** ~60 KB (compressed)
-- **Files:** 33 files
+- **Files:** ~40+ files (lib directory with JS + type definitions)
 - **Dependencies:** 3 (commander, fast-glob, svgo)
+- **Dev Dependencies:** 8 (typescript, vite, vitest, oxlint, oxfmt, etc.)
 - **Node Version:** >=18.0.0
-- **License:** MIT
+- **License:** ISC
 
 ## 🎉 Ready to Publish!
 
