@@ -15,13 +15,8 @@ const svgstore = (options: SvgstoreOptions = {}): SvgstoreApi => {
 
   const api: SvgstoreApi = {
     add(id: string, svg: string) {
-      const { inner, viewBox, width, height } = extractInnerSvg(svg);
-      const attrs = [
-        `id="${id}"`,
-        viewBox ? `viewBox="${viewBox}"` : null,
-        width ? `width="${width}"` : null,
-        height ? `height="${height}"` : null,
-      ]
+      const { inner, viewBox } = extractInnerSvg(svg);
+      const attrs = [`id="${id}"`, viewBox ? `viewBox="${viewBox}"` : null]
         .filter((attr): attr is string => typeof attr === "string")
         .join(" ");
 

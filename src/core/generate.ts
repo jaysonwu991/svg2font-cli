@@ -48,7 +48,6 @@ const buildZip = async (params: {
   const symbolFile = `${fileBase}.symbol.svg`;
 
   const demoCssFile = "demo.css";
-  const demoHtmlFile = "demo_index.html";
 
   const demoCss = buildDemoCss();
   const demo = buildDemoHtml({
@@ -75,7 +74,6 @@ const buildZip = async (params: {
   zip.addFile(assetPath(jsFile), iconfontJs);
   zip.addFile(assetPath(symbolFile), sprite);
   zip.addFile(assetPath(demoCssFile), demoCss);
-  zip.addFile(assetPath(demoHtmlFile), demo);
   zip.addFile(assetPath("demo.html"), demo);
   zip.addFile(assetPath(`${fileBase}.json`), manifest);
 
