@@ -6,46 +6,70 @@
 [![License: ISC](https://img.shields.io/badge/License-ISC-blue.svg)](https://opensource.org/licenses/ISC)
 [![Node.js Version](https://img.shields.io/node/v/svg2font-cli.svg)](https://nodejs.org/)
 
-A modern, zero-native-dependency CLI and Node.js library that transforms a folder of SVG icons into a professional iconfont bundle, similar to [iconfont.cn](https://www.iconfont.cn/). Built with TypeScript, featuring pure-JS TTF generation without native bindings.
+Transform a folder of SVG icons into a professional, production-ready iconfont bundle — just like [iconfont.cn](https://www.iconfont.cn/), but as a CLI tool and Node.js library. Built with TypeScript, zero native dependencies.
 
-## ✨ Features
+## 🎯 Why Use This?
 
-- 🚀 **Zero Native Dependencies** - Pure TypeScript/JavaScript implementation
-- 📦 **Complete Bundle** - Generates SVG, TTF, WOFF, WOFF2, and EOT formats
-- 🎯 **Three Usage Modes** - Unicode, Font Class, and SVG Symbol
-- 🎨 **Beautiful Demos** - Auto-generated HTML demos with live examples
-- ⚡ **Modern Tooling** - Built with Vite, oxlint, and TypeScript
-- 🔧 **CLI & API** - Use as command-line tool or Node.js library
-- 🎭 **Smart Optimization** - Built-in SVGO optimization (optional)
-- 📝 **Full TypeScript** - Complete type definitions included
+**Problem:** You have a folder of SVG icons and need to use them as an iconfont in your web project.
+
+**Solution:** This tool automatically generates:
+- ✅ Font files in all formats (SVG, TTF, WOFF, WOFF2, EOT)
+- ✅ Ready-to-use CSS with three different usage methods
+- ✅ Beautiful HTML demo pages to preview your icons
+- ✅ SVG sprites for modern web apps
+- ✅ Complete bundle packaged in a single zip file
+
+**Perfect for:**
+- Design systems needing consistent icon sets
+- Converting custom SVG icons to web fonts
+- Projects requiring IE11 support (EOT format)
+- Teams wanting iconfont.cn-style output locally
 
 ## 📋 Requirements
 
 - **Node.js** 18.0.0 or higher
-- **pnpm** (optional, but recommended)
 
 ## 🚀 Quick Start
 
 ### Installation
 
 ```bash
-# Using npm
+# Using npm (recommended for global CLI)
 npm install -g svg2font-cli
 
-# Using pnpm
+# Or with pnpm
 pnpm add -g svg2font-cli
 
-# Using yarn
+# Or with yarn
 yarn global add svg2font-cli
 ```
 
 ### Basic Usage
 
-```bash
-# Simple command
-svg2font --input ./icons --output ./dist --name myicons
+**Step 1:** Create a folder with your SVG icons
+```
+icons/
+├── home.svg
+├── user.svg
+└── settings.svg
+```
 
-# With all options
+**Step 2:** Run the command
+```bash
+svg2font --input ./icons --output ./dist --name myicons
+```
+
+**Step 3:** Use the generated files
+```
+dist/
+└── myicons.zip  ← Extract this to your project
+```
+
+That's it! Open `demo.html` inside the zip to see all three usage methods.
+
+### Advanced Options
+
+```bash
 svg2font -i ./icons -o ./dist -n myicons -p icon --no-optimize
 ```
 
@@ -59,58 +83,92 @@ svg2font -i ./icons -o ./dist -n myicons -p icon --no-optimize
 | `--prefix` | `-p` | `icon` | CSS class prefix (e.g., `icon-home`) |
 | `--no-optimize` | - | `false` | Skip SVGO optimization |
 
-## 📦 Output Structure
+## 📦 What You Get
 
-Running the CLI produces a zip file `<name>.zip` containing:
+The CLI generates a complete iconfont bundle in a zip file:
 
 ```
-myicons/
-├── myicons.svg          # SVG font
-├── myicons.ttf          # TrueType font
-├── myicons.woff         # WOFF font
-├── myicons.woff2        # WOFF2 font
-├── myicons.eot          # EOT font (IE support)
-├── myicons.css          # Iconfont stylesheet
-├── myicons.js           # Auto-injecting sprite loader
-├── myicons.symbol.svg   # SVG sprite
-├── myicons.json         # Glyph metadata manifest
-├── demo.css             # Demo page styles
-└── demo.html            # Interactive demo page
+myicons.zip
+└── myicons/
+    ├── 🔤 Font Files
+    │   ├── myicons.svg          # SVG font
+    │   ├── myicons.ttf          # TrueType font
+    │   ├── myicons.woff         # WOFF font (modern browsers)
+    │   ├── myicons.woff2        # WOFF2 font (best compression)
+    │   └── myicons.eot          # EOT font (IE11 support)
+    │
+    ├── 🎨 Stylesheets & Assets
+    │   ├── myicons.css          # Main stylesheet with @font-face
+    │   ├── myicons.js           # SVG sprite auto-injector
+    │   └── myicons.symbol.svg   # SVG sprite definitions
+    │
+    ├── 📄 Documentation
+    │   ├── demo.html            # Live preview of all icons
+    │   ├── demo.css             # Demo page styles
+    │   └── myicons.json         # Glyph metadata (names, unicode points)
 ```
 
-## 🎯 Usage Modes
+**Key benefits:**
+- All font formats for maximum browser compatibility
+- Three different usage methods (see below)
+- Interactive demo to copy-paste code snippets
+- JSON manifest for programmatic access
 
-### 1. Unicode Mode
+## 🎯 Three Ways to Use Your Icons
 
-Direct Unicode character references with minimal CSS:
+The generated CSS supports three different methods. Choose based on your needs:
+
+### 1. 📝 Unicode Mode (Simplest)
+
+**When to use:** Simple projects, minimal CSS
+
+Direct Unicode character references:
 
 ```html
 <link rel="stylesheet" href="myicons.css">
 <span class="iconfont">&#xe001;</span>
 ```
 
-### 2. Font Class Mode
+✅ Smallest CSS footprint
+❌ Hard to remember unicode values
 
-Semantic class names for better readability:
+### 2. 🏷️ Font Class Mode (Recommended)
+
+**When to use:** Most projects, readable code
+
+Semantic class names:
 
 ```html
 <link rel="stylesheet" href="myicons.css">
-<span class="iconfont icon-home"></span>
+<i class="iconfont icon-home"></i>
+<i class="iconfont icon-user"></i>
+<i class="iconfont icon-settings"></i>
 ```
 
-### 3. SVG Symbol Mode
+✅ Easy to read and maintain
+✅ Works in all browsers
+❌ Slightly larger CSS file
 
-Modern SVG sprites with `<use>` elements:
+### 3. 🎨 SVG Symbol Mode (Modern)
+
+**When to use:** Modern apps, multicolor icons, better accessibility
+
+SVG sprites with `<use>` elements:
 
 ```html
-<script src="myicons.js" data-injectcss="true"></script>
+<!-- Auto-inject SVG sprite -->
+<script src="myicons.js"></script>
 <svg class="icon" aria-hidden="true">
   <use href="#icon-home"></use>
 </svg>
 ```
 
-**Disable auto-injection:**
+✅ Multicolor support
+✅ Better accessibility
+✅ CSS animations work better
+❌ No IE11 support
 
+**Advanced: Manual sprite loading**
 ```html
 <script src="myicons.js" data-disable-injectsvg="true"></script>
 <svg class="icon">
@@ -118,9 +176,30 @@ Modern SVG sprites with `<use>` elements:
 </svg>
 ```
 
-## 💻 Programmatic Usage
+### Styling Your Icons
 
-Use as a Node.js library with full TypeScript support:
+All modes support standard CSS styling:
+
+```css
+.icon {
+  width: 1em;
+  height: 1em;
+  font-size: 32px;  /* Control size */
+  color: #333;      /* Control color */
+}
+```
+
+## 💻 Use as a Node.js Library
+
+Install as a project dependency and use programmatically:
+
+```bash
+npm install svg2font-cli
+# or
+pnpm add svg2font-cli
+```
+
+### Basic Example
 
 ```typescript
 import { generateIconfont } from 'svg2font-cli';
@@ -131,137 +210,218 @@ const result = await generateIconfont({
   name: 'myicons',
   prefix: 'icon',
   optimize: true,
-  codepointStart: 0xe001, // Optional: custom starting codepoint
 });
 
-console.log(`Generated: ${result.zipPath}`);
-console.log(`Total glyphs: ${result.glyphs.length}`);
+console.log(`✅ Generated: ${result.zipPath}`);
+console.log(`📊 Total icons: ${result.glyphs.length}`);
 ```
 
-### API Types
+### API Reference
 
 ```typescript
 interface GenerateOptions {
-  input: string;           // Glob pattern or directory
-  output: string;          // Output directory
-  name: string;            // Font family name
-  prefix?: string;         // CSS class prefix (default: 'icon')
+  input: string;           // Glob pattern or directory (e.g., "icons/*.svg")
+  output: string;          // Output directory (e.g., "dist")
+  name: string;            // Font family name (e.g., "myicons")
+  prefix?: string;         // CSS class prefix (default: "icon")
   optimize?: boolean;      // Run SVGO optimization (default: true)
-  codepointStart?: number; // Starting Unicode codepoint (default: 0xe001)
+  codepointStart?: number; // Starting Unicode point (default: 0xe001)
 }
 
 interface GenerateResult {
-  zipPath: string;         // Path to generated zip file
-  zipBuffer: Buffer;       // Zip file contents
-  glyphs: GlyphMeta[];     // Array of glyph metadata
+  zipPath: string;         // Full path to generated zip file
+  zipBuffer: Buffer;       // Zip file contents in memory
+  glyphs: GlyphMeta[];     // Array of icon metadata
+}
+
+interface GlyphMeta {
+  name: string;            // Icon name (e.g., "home")
+  unicode: string;         // Unicode character (e.g., "&#xe001;")
+  className: string;       // CSS class name (e.g., "icon-home")
 }
 ```
 
-## 🏗️ Project Structure
+### Advanced Example
 
-```
-svg2font-cli/
-├── src/
-│   ├── cli/                 # CLI interface
-│   │   └── run.ts          # Command setup
-│   ├── core/                # Business logic
-│   │   ├── generate.ts      # Main orchestrator
-│   │   ├── icons.ts         # SVG loading with SVGO
-│   │   ├── glyphs.ts        # Codepoint assignment
-│   │   ├── names.ts         # CSS class name generation
-│   │   ├── sprite.ts        # SVG sprite creation
-│   │   ├── svg-font-generator.ts
-│   │   ├── svg-sprite-store.ts
-│   │   └── zip.ts           # ZIP archive generation
-│   ├── utils/               # Shared utilities
-│   │   ├── svg-helpers.ts   # SVG parsing
-│   │   └── font/            # Font generation modules
-│   │       ├── ttf-converter.ts    # TTF/WOFF/EOT generation
-│   │       ├── woff2-converter.ts  # WOFF2 generation
-│   │       ├── svg-path-parser.ts  # SVG path parsing
-│   │       ├── svg-to-ttf-path.ts  # Path conversion
-│   │       ├── binary-writer.ts    # Binary utilities
-│   │       └── ttf-builder.ts      # TTF table building
-│   ├── templates/           # CSS/HTML/JS generators
-│   │   ├── css.ts           # Font CSS
-│   │   ├── demo.ts          # Demo HTML
-│   │   ├── demo-css.ts      # Demo styles
-│   │   ├── iconfont.ts      # Sprite loader
-│   │   ├── manifest.ts      # JSON metadata
-│   │   └── shared.ts        # Template helpers
-│   ├── types.ts             # TypeScript interfaces
-│   ├── defaults.ts          # Configuration defaults
-│   └── index.ts             # Main exports
-├── lib/                     # Built output (gitignored)
-├── test/                    # Test files
-└── package.json
+```typescript
+import { generateIconfont } from 'svg2font-cli';
+import { writeFileSync } from 'fs';
+
+// Generate with custom options
+const result = await generateIconfont({
+  input: 'src/assets/icons/**/*.svg',
+  output: 'dist/fonts',
+  name: 'my-design-system',
+  prefix: 'ds-icon',
+  optimize: true,
+  codepointStart: 0xf000, // Custom unicode range
+});
+
+// Access the zip buffer directly
+writeFileSync('custom-path/fonts.zip', result.zipBuffer);
+
+// Generate a custom mapping file
+const mapping = result.glyphs.reduce((acc, glyph) => {
+  acc[glyph.name] = {
+    unicode: glyph.unicode,
+    className: glyph.className,
+  };
+  return acc;
+}, {});
+
+writeFileSync('icon-mapping.json', JSON.stringify(mapping, null, 2));
 ```
 
-## 🎨 File Naming Conventions
+## ❓ Common Questions
 
-- SVG filenames are automatically converted to kebab-case
-- Example: `Node.js.svg` → `.icon-node-js`
-- Special characters are removed or replaced with hyphens
-- All class names are lowercase for consistency
+### How do I name my SVG files?
+
+Filenames are automatically converted to kebab-case CSS classes:
+- `home.svg` → `.icon-home`
+- `User Profile.svg` → `.icon-user-profile`
+- `Node.js.svg` → `.icon-node-js`
+
+**Best practices:**
+- Use descriptive names (e.g., `arrow-right.svg` not `icon1.svg`)
+- Avoid special characters
+- Lowercase is recommended
+
+### What if my icons don't display correctly?
+
+Common issues and fixes:
+
+1. **Icon is the wrong size**
+   ```css
+   .iconfont { font-size: 24px; } /* Adjust this */
+   ```
+
+2. **Icon colors don't work**
+   - Font icons are monochrome by default
+   - Use SVG Symbol mode for multicolor support
+   - Set color with CSS: `color: #ff0000;`
+
+3. **Icons show as squares/missing glyphs**
+   - Check that your SVG files are valid
+   - Ensure the CSS file is loaded before HTML
+   - Verify font files are accessible (check browser console)
+
+### Can I use this in production?
+
+Yes! This tool generates production-ready assets:
+- All major font formats for cross-browser support
+- Optimized SVG paths (via SVGO)
+- IE11 support included (EOT format)
+- Used in projects similar to iconfont.cn
+
+### How is this different from iconfont.cn?
+
+| Feature | svg2font-cli | iconfont.cn |
+|---------|--------------|-------------|
+| **Privacy** | ✅ All local, no upload | ❌ Must upload icons |
+| **Offline** | ✅ Works offline | ❌ Requires internet |
+| **Automation** | ✅ CI/CD friendly | ❌ Manual process |
+| **Customization** | ✅ Full control | Limited |
+| **Open Source** | ✅ ISC License | ❌ Closed |
+
+## 🎨 SVG File Requirements
+
+Your SVG files should:
+- ✅ Be valid SVG format
+- ✅ Contain `<path>` elements
+- ✅ Have viewBox attribute (or width/height)
+- ✅ Use single color (for font mode) or multiple colors (for symbol mode)
+- ❌ Avoid external dependencies (linked images, external CSS)
+- ❌ Avoid filters or effects that don't translate to fonts
+
+**Tip:** The tool automatically optimizes SVGs with SVGO. Use `--no-optimize` only if you've already optimized them.
 
 ## 🛠️ Development
 
+Want to contribute or customize the tool?
+
 ```bash
-# Clone the repository
+# Clone and setup
 git clone https://github.com/jaysonwu991/svg2font-cli.git
 cd svg2font-cli
-
-# Install dependencies
 pnpm install
 
-# Build the project
-pnpm build
+# Development commands
+pnpm build              # Build the project
+pnpm test               # Run tests
+pnpm test:coverage      # Generate coverage report
+pnpm lint               # Check code quality
+pnpm format             # Format code
+pnpm type-check         # TypeScript validation
 
-# Run linting
-pnpm lint
-
-# Format code
-pnpm format
-
-# Run the CLI locally
-node lib/cli.js --input ./assets --output ./dist
+# Test the CLI locally
+node lib/cli.js -i ./assets -o ./dist
 ```
 
-### Available Scripts
+### Project Architecture
 
-- `pnpm build` - Clean, build JS bundles, and generate type definitions
-- `pnpm clean` - Remove the `lib/` directory
-- `pnpm test` - Run tests
-- `pnpm test:watch` - Run tests in watch mode
-- `pnpm test:ui` - Run tests with UI
-- `pnpm test:coverage` - Generate coverage report
-- `pnpm lint` - Run oxlint on source files
-- `pnpm lint:fix` - Auto-fix linting issues
-- `pnpm format` - Format code with oxfmt
-- `pnpm format:check` - Check code formatting
-- `pnpm type-check` - Run TypeScript type checking
+```
+src/
+├── cli/                    # Command-line interface
+├── core/                   # Core business logic
+│   ├── generate.ts         # Main orchestrator
+│   ├── icons.ts            # SVG loading with SVGO
+│   ├── glyphs.ts           # Unicode codepoint assignment
+│   └── sprite.ts           # SVG sprite generation
+├── utils/font/             # Font generation engine
+│   ├── ttf-converter.ts    # TTF/WOFF/EOT generation
+│   ├── woff2-converter.ts  # WOFF2 generation
+│   └── svg-to-ttf-path.ts  # Path conversion algorithms
+├── templates/              # CSS/HTML/JS generators
+└── types.ts                # TypeScript definitions
+```
 
-## 🔧 Technical Details
+**Key features of the codebase:**
+- 🚀 Pure TypeScript - zero native dependencies
+- ✅ Full test coverage with Vitest
+- 📝 Comprehensive TypeScript types
+- 🎨 Modern build system with Vite
+- 🔍 Strict linting with oxlint
 
-### Pure TypeScript Implementation
+## 🔬 Technical Deep Dive
 
-- **No Native Dependencies** - Everything runs in pure JavaScript/TypeScript
-- **Custom TTF Generation** - Hand-coded TrueType font table generation (10 SFNT tables)
-- **Cubic-to-Quadratic** - Recursive Bézier curve conversion with tolerance-based subdivision
-- **Path Optimization** - Contour simplification, interpolation, and even-odd fill rule
-- **WOFF/WOFF2 Conversion** - Pure JS implementations using zlib deflate and brotli
-- **EOT Support** - IE compatibility format with proper metadata encoding
-- **Binary Protocol Mastery** - Custom implementations of ZIP, TTF, WOFF, WOFF2, and EOT formats
+For those interested in the implementation details:
+
+### Zero Native Dependencies
+
+Unlike similar tools that rely on native bindings (node-gyp, Python scripts), this project is **100% pure TypeScript/JavaScript**:
+
+- **Custom TTF Generator** - Hand-coded TrueType font table builder (10 SFNT tables)
+- **Cubic-to-Quadratic Bezier** - Recursive curve conversion with adaptive subdivision
+- **Pure JS WOFF/WOFF2** - Native compression using Node.js zlib and brotli
+- **Binary Protocol Implementation** - Custom ZIP, TTF, WOFF, WOFF2, and EOT format writers
 
 ### Font Generation Pipeline
 
-1. **Load & Sanitize** - Read SVG files and clean paths
-2. **Assign Codepoints** - Map icons to Unicode Private Use Area
-3. **Generate SVG Font** - Create SVG font with proper metrics
-4. **Convert to TTF** - Build TrueType tables and binary format
-5. **Generate WOFF/WOFF2/EOT** - Convert TTF to web formats
-6. **Build Templates** - Generate CSS, demos, and sprites
-7. **Package** - Create organized zip bundle
+```
+SVG Files
+    ↓
+1. Load & Optimize (SVGO)
+    ↓
+2. Assign Unicode Codepoints (0xe001+)
+    ↓
+3. Generate SVG Font
+    ↓
+4. Parse SVG Paths → Convert to TTF Contours
+    ↓
+5. Build TTF Binary (head, hhea, maxp, post, name, cmap, glyf, loca, hmtx, OS/2)
+    ↓
+6. Convert TTF → WOFF (zlib), WOFF2 (brotli), EOT
+    ↓
+7. Generate Templates (CSS, HTML, JS)
+    ↓
+8. Package ZIP Bundle
+```
+
+This approach ensures:
+- ✅ No installation issues across platforms
+- ✅ Predictable behavior everywhere
+- ✅ Easy to audit and modify
+- ✅ No binary dependencies breaking with Node.js updates
 
 ## 📄 License
 
