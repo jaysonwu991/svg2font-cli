@@ -1,6 +1,6 @@
 {
   "name": "svg2font-cli",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "CLI and Node API to convert SVG icon sets into complete iconfont bundles (SVG/TTF/WOFF/WOFF2/EOT) with CSS, demos, and sprites - zero native dependencies",
   "keywords": [
     "svg",
