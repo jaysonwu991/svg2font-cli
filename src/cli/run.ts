@@ -9,7 +9,7 @@ export const runCli = async (): Promise<void> => {
     .description("Convert SVG icons into a downloadable iconfont zip (similar to iconfont.cn).")
     .option(
       "-i, --input <path>",
-      "Directory or glob that resolves to svg files",
+      "Directory or glob pattern for SVG files",
       DEFAULT_CLI_OPTIONS.input,
     )
     .option(

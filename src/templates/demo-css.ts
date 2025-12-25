@@ -56,7 +56,7 @@ export const buildDemoCss = (): string => `/* Basic utility classes */
   display: none;
 }
 
-/* 页面布局 */
+/* Page layout */
 .main {
   padding: 30px 100px;
   width: 960px;
@@ -121,14 +121,14 @@ export const buildDemoCss = (): string => `/* Basic utility classes */
 }
 
 .icon_lists .svg-icon {
-  /* 通过设置 font-size 来改变图标大小 */
+  /* Change icon size by setting font-size */
   width: 1em;
-  /* 图标和文字相邻时，垂直对齐 */
+  /* Vertical alignment when icon is adjacent to text */
   vertical-align: -0.15em;
-  /* 通过设置 color 来改变 SVG 的颜色/fill */
+  /* Change SVG color/fill by setting color */
   fill: currentColor;
-  /* path 和 stroke 溢出 viewBox 部分在 IE 下会显示
-      normalize.css 中也包含这行 */
+  /* Hide path and stroke overflow outside viewBox in IE
+      This is also included in normalize.css */
   overflow: hidden;
 }
 
@@ -383,7 +383,7 @@ export const buildDemoCss = (): string => `/* Basic utility classes */
   text-decoration: underline;
 }
 
-/* 代码高亮 */
+/* Code highlighting */
 /* PrismJS 1.15.0
 https://prismjs.com/download.html#themes=prism&languages=markup+css+clike+javascript */
 /**

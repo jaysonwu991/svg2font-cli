@@ -119,19 +119,19 @@ ${unicodeIcons}
 
           </ul>
           <div class="article markdown">
-          <h2 id="unicode-">Unicode 引用</h2>
+          <h2 id="unicode-">Unicode Reference</h2>
           <hr>
 
-          <p>Unicode 是字体在网页端最原始的应用方式，特点是：</p>
+          <p>Unicode is the most basic way to use fonts on the web. Features:</p>
           <ul>
-            <li>支持按字体的方式去动态调整图标大小，颜色等等。</li>
-            <li>默认情况下不支持多色，直接添加多色图标会自动去色。</li>
+            <li>Supports dynamic adjustment of icon size, color, etc. like regular fonts.</li>
+            <li>Does not support multi-color by default. Multi-color icons will be automatically converted to single color.</li>
           </ul>
           <blockquote>
-            <p>Note: Multi-color icons are supported via SVG symbol method or color font icon mode.</p>
+            <p>Note: Multi-color icons are supported via the SVG symbol method or color font mode.</p>
           </blockquote>
-          <p>Unicode 使用步骤如下：</p>
-          <h3 id="-font-face">第一步：拷贝项目下面生成的 <code>@font-face</code></h3>
+          <p>Usage steps:</p>
+          <h3 id="-font-face">Step 1: Copy the generated <code>@font-face</code> code</h3>
 <pre><code class="language-css"
 >@font-face {
   font-family: '${fontName}';
@@ -140,7 +140,7 @@ ${unicodeIcons}
        url('${fileBase}.ttf${versionSuffix}') format('truetype');
 }
 </code></pre>
-          <h3 id="-iconfont-">第二步：定义使用 iconfont 的样式</h3>
+          <h3 id="-iconfont-">Step 2: Define the iconfont styles</h3>
 <pre><code class="language-css"
 >.iconfont {
   font-family: "${fontName}" !important;
@@ -150,7 +150,7 @@ ${unicodeIcons}
   -moz-osx-font-smoothing: grayscale;
 }
 </code></pre>
-          <h3 id="-">第三步：挑选相应图标并获取字体编码，应用于页面</h3>
+          <h3 id="-">Step 3: Select an icon and use its character code on the page</h3>
 <pre>
 <code class="language-html"
 >&lt;span class="iconfont"&gt;&amp;#x33;&lt;/span&gt;
@@ -166,20 +166,20 @@ ${fontClassIcons}
 
         </ul>
         <div class="article markdown">
-        <h2 id="font-class-">font-class 引用</h2>
+        <h2 id="font-class-">Font Class Reference</h2>
         <hr>
 
-        <p>font-class 是 Unicode 使用方式的一种变种，主要是解决 Unicode 书写不直观，语意不明确的问题。</p>
-        <p>与 Unicode 使用方式相比，具有如下特点：</p>
+        <p>Font class is a variant of Unicode usage that addresses the issue of Unicode being unintuitive and unclear in meaning.</p>
+        <p>Compared to Unicode usage, it has the following advantages:</p>
         <ul>
-          <li>相比于 Unicode 语意明确，书写更直观。可以很容易分辨这个 icon 是什么。</li>
-          <li>因为使用 class 来定义图标，所以当要替换图标时，只需要修改 class 里面的 Unicode 引用。</li>
+          <li>Compared to Unicode, it is semantically clear and more intuitive to write. You can easily tell what icon this is.</li>
+          <li>Because icons are defined using classes, when you need to replace an icon, you only need to modify the Unicode reference in the class.</li>
         </ul>
-        <p>使用步骤如下：</p>
-        <h3 id="-fontclass-">第一步：引入项目下面生成的 fontclass 代码：</h3>
+        <p>Usage steps:</p>
+        <h3 id="-fontclass-">Step 1: Include the generated fontclass CSS file in your project:</h3>
 <pre><code class="language-html">&lt;link rel="stylesheet" href="./${fileBase}.css"&gt;
 </code></pre>
-        <h3 id="-">第二步：挑选相应图标并获取类名，应用于页面：</h3>
+        <h3 id="-">Step 2: Select an icon and use its class name on the page:</h3>
 <pre><code class="language-html">&lt;span class="iconfont icon-xxx"&gt;&lt;/span&gt;
 </code></pre>
         <blockquote>
@@ -193,22 +193,22 @@ ${symbolIcons}
 
           </ul>
           <div class="article markdown">
-          <h2 id="symbol-">Symbol 引用</h2>
+          <h2 id="symbol-">Symbol Reference</h2>
           <hr>
 
-          <p>这是一种全新的使用方式，应该说这才是未来的主流，也是平台目前推荐的用法。相关介绍可以参考这篇<a href="">文章</a>
-            这种用法其实是做了一个 SVG 的集合，与另外两种相比具有如下特点：</p>
+          <p>This is a new way to use icons and represents the future mainstream approach, which is currently the recommended method by the platform. For more information, refer to this <a href="">article</a>.
+            This approach creates an SVG sprite collection. Compared to the other two methods, it has the following features:</p>
           <ul>
-            <li>支持多色图标了，不再受单色限制。</li>
-            <li>通过一些技巧，支持像字体那样，通过 <code>font-size</code>, <code>color</code> 来调整样式。</li>
-            <li>兼容性较差，支持 IE9+，及现代浏览器。</li>
-            <li>浏览器渲染 SVG 的性能一般，还不如 png。</li>
+            <li>Supports multi-color icons, no longer limited to single colors.</li>
+            <li>Through some techniques, supports font-like styling via <code>font-size</code> and <code>color</code>.</li>
+            <li>Lower browser compatibility, supports IE9+ and modern browsers.</li>
+            <li>Browser SVG rendering performance is generally lower than PNG.</li>
           </ul>
-          <p>使用步骤如下：</p>
-          <h3 id="-symbol-">第一步：引入项目下面生成的 symbol 代码：</h3>
+          <p>Usage steps:</p>
+          <h3 id="-symbol-">Step 1: Include the generated symbol JavaScript file in your project:</h3>
 <pre><code class="language-html">&lt;script src="./${fileBase}.js"&gt;&lt;/script&gt;
 </code></pre>
-          <h3 id="-css-">第二步：加入通用 CSS 代码（引入一次就行）：</h3>
+          <h3 id="-css-">Step 2: Add the general CSS code (include once):</h3>
 <pre><code class="language-html">&lt;style&gt;
 .icon {
   width: 1em;
@@ -219,7 +219,7 @@ ${symbolIcons}
 }
 &lt;/style&gt;
 </code></pre>
-          <h3 id="-">第三步：挑选相应图标并获取类名，应用于页面：</h3>
+          <h3 id="-">Step 3: Select an icon and use it on the page:</h3>
 <pre><code class="language-html">&lt;svg class="icon" aria-hidden="true"&gt;
   &lt;use xlink:href="#icon-xxx"&gt;&lt;/use&gt;
 &lt;/svg&gt;

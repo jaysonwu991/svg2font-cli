@@ -1948,7 +1948,7 @@ export const ttfToEot = (arr: Uint8Array): Buffer => {
   }
 
   if (!(haveOS2 && haveName && haveHead)) {
-    throw new Error("Required section not found");
+    throw new Error("Required font table sections not found (missing one or more: OS/2, name, head)");
   }
 
   const eot = Buffer.concat([
