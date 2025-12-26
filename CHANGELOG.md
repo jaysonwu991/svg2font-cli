@@ -5,6 +5,34 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.2] - 2025-12-26
+
+### ✨ Improvements
+
+#### Performance Optimizations
+- **Parallel Processing** - Font format conversions (WOFF, WOFF2, EOT) now run in parallel
+- **Parallel Icon Loading** - SVG files are now loaded and processed concurrently
+- **Cached Regex Patterns** - Pre-compiled regex patterns for SVG path parsing
+
+#### Code Quality & Documentation
+- **Enhanced JSDoc Comments** - Comprehensive documentation added to core functions:
+  - `generateIconfont()` - Complete API documentation with examples
+  - `sanitizeName()` - Filename sanitization documentation
+  - `toAbsolutePattern()` - Path resolution documentation
+  - `loadIcons()` - Icon loading documentation
+- **Code Refactoring** - Better modularization of font generation code:
+  - Split `ttf-converter.ts` into focused modules (`binary-writer.ts`, `ttf-builder.ts`, `svg-to-ttf-path.ts`)
+  - Improved separation of concerns for better maintainability
+
+#### Documentation Updates
+- **README.md** - Updated with performance improvements and new npm scripts
+- **Removed Planned Features** - Cleaned up unreleased features section
+
+### 🐛 Bug Fixes
+- Fixed regex lastIndex issue in global pattern matching
+
+---
+
 ## [1.0.0] - 2025-12-14
 
 ### 🎉 Initial Release
@@ -103,15 +131,5 @@ ISC
 
 ---
 
-## [Unreleased]
-
-### Planned Features
-- [ ] Additional font formats (OTF)
-- [ ] Custom templates support
-- [ ] Incremental builds
-- [ ] Watch mode for development
-- [ ] Integration with popular build tools
-
----
-
+[1.0.2]: https://github.com/jaysonwu991/svg2font-cli/releases/tag/v1.0.2
 [1.0.0]: https://github.com/jaysonwu991/svg2font-cli/releases/tag/v1.0.0

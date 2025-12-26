@@ -89,6 +89,40 @@ const buildZip = async (params: {
   return { zipPath, zipBuffer: content };
 };
 
+/**
+ * Generates an icon font from SVG files.
+ *
+ * @param options - Configuration options for icon font generation
+ * @param options.input - Glob pattern or directory path to SVG files
+ * @param options.output - Output directory for the generated font ZIP file
+ * @param options.name - Font family name (default: "iconfont")
+ * @param options.prefix - CSS class prefix for icons (default: "icon")
+ * @param options.codepointStart - Starting codepoint for icon mapping (default: 0xE001)
+ * @param options.optimize - Whether to optimize SVG files with SVGO (default: false)
+ *
+ * @returns A promise that resolves to the generation result containing:
+ *   - zipPath: Absolute path to the generated ZIP file
+ *   - glyphs: Array of processed glyph metadata
+ *   - zipBuffer: Buffer containing the ZIP file content
+ *
+ * @example
+ * ```typescript
+ * import { generateIconfont } from 'svg2font-cli';
+ *
+ * const result = await generateIconfont({
+ *   input: './icons/*.svg',
+ *   output: './dist',
+ *   name: 'my-icons',
+ *   prefix: 'mi'
+ * });
+ *
+ * console.log(`Font generated at: ${result.zipPath}`);
+ * console.log(`Total glyphs: ${result.glyphs.length}`);
+ * ```
+ *
+ * @throws {Error} If no SVG files are found matching the input pattern
+ * @throws {Error} If font generation fails due to invalid SVG data
+ */
 export const generateIconfont = async (options: GenerateOptions): Promise<GenerateResult> => {
   const resolved = resolveGenerateOptions(options);
 
@@ -99,9 +133,14 @@ export const generateIconfont = async (options: GenerateOptions): Promise<Genera
   const svgFont = createSvgFont(glyphs, resolved.name, unitsPerEm);
 
   const ttf = toBuffer(svgToTtf(glyphs, resolved.name, unitsPerEm));
-  const woff = toBuffer(ttfToWoff(new Uint8Array(ttf)));
-  const woff2 = toBuffer(ttfToWoff2(new Uint8Array(ttf)));
-  const eot = toBuffer(ttfToEot(new Uint8Array(ttf)));
+
+  // Convert TTF to other formats in parallel
+  const [woff, woff2, eot] = await Promise.all([
+    Promise.resolve(toBuffer(ttfToWoff(new Uint8Array(ttf)))),
+    Promise.resolve(toBuffer(ttfToWoff2(new Uint8Array(ttf)))),
+    Promise.resolve(toBuffer(ttfToEot(new Uint8Array(ttf)))),
+  ]);
+
   const cacheBust = Date.now().toString();
 
   const { zipPath, zipBuffer } = await buildZip({

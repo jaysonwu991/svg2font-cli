@@ -6,6 +6,11 @@ export const DEFAULT_UNITS_PER_EM = 1024;
 export const DEFAULT_ASCENT = 896;
 export const DEFAULT_DESCENT = -128;
 
+// Cached regex patterns for better performance
+const PATH_TAG_REGEX = /<path\b([^>]*?)>/gim;
+const D_ATTR_REGEX = /d\s*=\s*("(.*?)"|'(.*?)')/i;
+const FILL_ATTR_REGEX = /fill\s*=\s*("(.*?)"|'(.*?)')/i;
+
 const escapeAttr = (value: string): string =>
   value.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
@@ -17,12 +22,13 @@ export const extractViewBox = (svg: string): ViewBoxInfo =>
 
 const extractPathEntries = (svg: string): PathEntry[] => {
   const entries: PathEntry[] = [];
-  const regex = /<path\b([^>]*?)>/gim;
+  // Reset regex lastIndex since it's global
+  PATH_TAG_REGEX.lastIndex = 0;
   let match: RegExpExecArray | null;
-  while ((match = regex.exec(svg))) {
+  while ((match = PATH_TAG_REGEX.exec(svg))) {
     const tag = match[0];
-    const dMatch = tag.match(/d\s*=\s*("(.*?)"|'(.*?)')/i);
-    const fillMatch = tag.match(/fill\s*=\s*("(.*?)"|'(.*?)')/i);
+    const dMatch = tag.match(D_ATTR_REGEX);
+    const fillMatch = tag.match(FILL_ATTR_REGEX);
     const d = dMatch?.[2] || dMatch?.[3];
     const fill = fillMatch?.[2] || fillMatch?.[3];
     if (d) {
