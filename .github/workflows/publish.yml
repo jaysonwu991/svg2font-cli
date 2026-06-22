@@ -1,0 +1,114 @@
+name: Publish
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build:
+    name: Build ${{ matrix.target }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - target: aarch64-apple-darwin
+            os: macos-latest
+            npm_pkg: svg2font-cli-darwin-arm64
+            binary: svg2font
+
+          - target: x86_64-apple-darwin
+            os: macos-latest
+            npm_pkg: svg2font-cli-darwin-x64
+            binary: svg2font
+
+          - target: x86_64-unknown-linux-gnu
+            os: ubuntu-latest
+            npm_pkg: svg2font-cli-linux-x64
+            binary: svg2font
+
+          - target: aarch64-unknown-linux-gnu
+            os: ubuntu-latest
+            npm_pkg: svg2font-cli-linux-arm64
+            binary: svg2font
+            use_cross: true
+
+          - target: x86_64-pc-windows-msvc
+            os: windows-latest
+            npm_pkg: svg2font-cli-win32-x64
+            binary: svg2font.exe
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Install cross (Linux ARM)
+        if: matrix.use_cross
+        run: cargo install cross --git https://github.com/cross-rs/cross
+
+      - name: Build (cross)
+        if: matrix.use_cross
+        run: cross build --release --target ${{ matrix.target }}
+
+      - name: Build (native)
+        if: "!matrix.use_cross"
+        run: cargo build --release --target ${{ matrix.target }}
+
+      - name: Copy binary into npm package
+        shell: bash
+        run: |
+          cp target/${{ matrix.target }}/release/${{ matrix.binary }} npm/${{ matrix.npm_pkg }}/
+
+      - name: Upload binary artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.npm_pkg }}
+          path: npm/${{ matrix.npm_pkg }}/${{ matrix.binary }}
+
+  publish:
+    name: Publish to npm
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Download all binaries
+        uses: actions/download-artifact@v4
+        with:
+          path: npm-artifacts
+
+      - name: Place binaries into npm packages
+        shell: bash
+        run: |
+          for pkg in svg2font-cli-darwin-arm64 svg2font-cli-darwin-x64 svg2font-cli-linux-x64 svg2font-cli-linux-arm64; do
+            cp npm-artifacts/$pkg/svg2font npm/$pkg/svg2font
+            chmod +x npm/$pkg/svg2font
+          done
+          cp npm-artifacts/svg2font-cli-win32-x64/svg2font.exe npm/svg2font-cli-win32-x64/svg2font.exe
+
+      - name: Publish platform packages
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          for pkg in svg2font-cli-darwin-arm64 svg2font-cli-darwin-x64 svg2font-cli-linux-x64 svg2font-cli-linux-arm64 svg2font-cli-win32-x64; do
+            npm publish npm/$pkg/ --access public
+          done
+
+      - name: Publish root package
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --access public

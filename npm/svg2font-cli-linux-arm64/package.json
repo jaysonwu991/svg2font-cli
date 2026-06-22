@@ -1,0 +1,19 @@
+{
+  "name": "svg2font-cli-linux-arm64",
+  "version": "1.0.2",
+  "description": "linux arm64 binary for svg2font-cli",
+  "os": ["linux"],
+  "cpu": ["arm64"],
+  "engines": {
+    "node": ">=18"
+  },
+  "preferUnplugged": true,
+  "license": "MIT",
+  "files": [
+    "svg2font"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jaysonwu991/svg2font-cli"
+  }
+}

@@ -1,89 +1,30 @@
 {
   "name": "svg2font-cli",
   "version": "1.0.2",
-  "description": "CLI and Node API to convert SVG icon sets into complete iconfont bundles (SVG/TTF/WOFF/WOFF2/EOT) with CSS, demos, and sprites - zero native dependencies",
-  "keywords": [
-    "svg",
-    "font",
-    "iconfont",
-    "webfont",
-    "icon-font",
-    "svg-to-font",
-    "ttf",
-    "woff",
-    "woff2",
-    "eot",
-    "font-generator",
-    "cli",
-    "typescript",
-    "zero-dependencies"
-  ],
-  "author": "Jayson Wu <jaysonwu991@outlook.com>",
-  "license": "ISC",
-  "homepage": "https://github.com/jaysonwu991/svg2font-cli#readme",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/jaysonwu991/svg2font-cli.git"
-  },
-  "bugs": {
-    "url": "https://github.com/jaysonwu991/svg2font-cli/issues"
-  },
-  "type": "commonjs",
-  "packageManager": "pnpm@10.24.0",
-  "engines": {
-    "node": ">=18.0.0"
-  },
-  "main": "lib/index.js",
-  "types": "lib/index.d.ts",
+  "description": "Generate icon fonts from SVG files",
   "bin": {
-    "svg2font": "lib/cli.js"
-  },
-  "exports": {
-    ".": {
-      "types": "./lib/index.d.ts",
-      "require": "./lib/index.js",
-      "import": "./lib/index.js"
-    },
-    "./cli": "./lib/cli.js"
+    "svg2font": "bin/svg2font.js"
   },
   "files": [
-    "lib",
-    "README.md",
-    "LICENSE",
-    "CHANGELOG.md"
+    "bin/"
   ],
-  "sideEffects": false,
-  "scripts": {
-    "preinstall": "npx only-allow pnpm",
-    "prepublishOnly": "pnpm build && pnpm test",
-    "clean": "rm -rf lib",
-    "build": "pnpm clean && pnpm build:js && pnpm build:types",
-    "build:js": "vite build --mode lib && vite build --mode cli",
-    "build:types": "tsc -p tsconfig.json --emitDeclarationOnly",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "test:ui": "vitest --ui",
-    "test:coverage": "vitest run --coverage",
-    "type-check": "tsc --noEmit",
-    "lint": "oxlint --tsconfig tsconfig.json src",
-    "lint:fix": "oxlint --fix --tsconfig tsconfig.json src",
-    "format": "oxfmt src",
-    "format:check": "oxfmt --check src"
+  "engines": {
+    "node": ">=18"
   },
-  "dependencies": {
-    "commander": "^14.0.2",
-    "fast-glob": "^3.3.3",
-    "svgo": "^4.0.0"
+  "optionalDependencies": {
+    "svg2font-cli-darwin-arm64": "1.0.2",
+    "svg2font-cli-darwin-x64": "1.0.2",
+    "svg2font-cli-linux-x64": "1.0.2",
+    "svg2font-cli-linux-arm64": "1.0.2",
+    "svg2font-cli-win32-x64": "1.0.2"
   },
-  "devDependencies": {
-    "@types/node": "^25.0.3",
-    "@vitest/coverage-v8": "4.0.16",
-    "@vitest/ui": "^4.0.16",
-    "happy-dom": "^20.0.11",
-    "oxfmt": "^0.19.0",
-    "oxlint": "^1.34.0",
-    "typescript": "^5.9.3",
-    "vite": "^7.3.0",
-    "vitest": "^4.0.16"
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jaysonwu991/svg2font-cli"
+  },
+  "homepage": "https://github.com/jaysonwu991/svg2font-cli",
+  "bugs": {
+    "url": "https://github.com/jaysonwu991/svg2font-cli/issues"
   }
 }
