@@ -1,5 +1,5 @@
 {
-  "name": "svg2font-cli-linux-x64",
+  "name": "@jaysonwu991/svg2font-cli-linux-x64",
   "version": "0.0.0",
   "description": "linux x64 binary for svg2font-cli",
   "os": ["linux"],
