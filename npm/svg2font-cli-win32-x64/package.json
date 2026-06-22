@@ -1,0 +1,19 @@
+{
+  "name": "svg2font-cli-win32-x64",
+  "version": "1.0.2",
+  "description": "win32 x64 binary for svg2font-cli",
+  "os": ["win32"],
+  "cpu": ["x64"],
+  "engines": {
+    "node": ">=18"
+  },
+  "preferUnplugged": true,
+  "license": "MIT",
+  "files": [
+    "svg2font.exe"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jaysonwu991/svg2font-cli"
+  }
+}
