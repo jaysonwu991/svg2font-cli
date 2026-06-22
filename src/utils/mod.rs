@@ -1,6 +1,5 @@
 /// Simplified font conversion utilities
 /// In production, these would use proper font generation libraries
-
 use crate::{Error, Result};
 
 /// Convert TTF to WOFF format (zlib compression) with optimized allocations
@@ -110,4 +109,90 @@ pub fn ttf_to_eot(ttf: &[u8]) -> Result<Vec<u8>> {
     eot[0..4].copy_from_slice(&total_size.to_le_bytes());
 
     Ok(eot)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // Minimal valid TTF: 12-byte sfnt header (required by ttf_to_woff)
+    // sfVersion=0x00010000 (TrueType), numTables=0, searchRange=0, entrySelector=0, rangeShift=0
+    fn minimal_ttf() -> Vec<u8> {
+        let mut data = vec![0u8; 12];
+        data[0..4].copy_from_slice(&[0x00, 0x01, 0x00, 0x00]); // sfVersion
+        data
+    }
+
+    #[test]
+    fn test_ttf_to_woff_returns_woff_signature() {
+        let ttf = minimal_ttf();
+        let woff = ttf_to_woff(&ttf).unwrap();
+        assert_eq!(&woff[0..4], b"wOFF");
+    }
+
+    #[test]
+    fn test_ttf_to_woff_length_field_correct() {
+        let ttf = minimal_ttf();
+        let woff = ttf_to_woff(&ttf).unwrap();
+        let stored_len = u32::from_be_bytes(woff[8..12].try_into().unwrap());
+        assert_eq!(stored_len as usize, woff.len());
+    }
+
+    #[test]
+    fn test_ttf_to_woff_too_short() {
+        let result = ttf_to_woff(&[0u8; 4]);
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_ttf_to_woff2_returns_woff2_signature() {
+        let ttf = minimal_ttf();
+        let woff2 = ttf_to_woff2(&ttf).unwrap();
+        assert_eq!(&woff2[0..4], b"wOF2");
+    }
+
+    #[test]
+    fn test_ttf_to_woff2_length_field_correct() {
+        let ttf = minimal_ttf();
+        let woff2 = ttf_to_woff2(&ttf).unwrap();
+        let stored_len = u32::from_be_bytes(woff2[8..12].try_into().unwrap());
+        assert_eq!(stored_len as usize, woff2.len());
+    }
+
+    #[test]
+    fn test_ttf_to_woff2_too_short() {
+        let result = ttf_to_woff2(&[0u8; 2]);
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_ttf_to_eot_returns_non_empty() {
+        let ttf = minimal_ttf();
+        let eot = ttf_to_eot(&ttf).unwrap();
+        assert!(!eot.is_empty());
+    }
+
+    #[test]
+    fn test_ttf_to_eot_file_size_field_correct() {
+        let ttf = minimal_ttf();
+        let eot = ttf_to_eot(&ttf).unwrap();
+        let stored_size = u32::from_le_bytes(eot[0..4].try_into().unwrap());
+        assert_eq!(stored_size as usize, eot.len());
+    }
+
+    #[test]
+    fn test_ttf_to_eot_original_size_field() {
+        let ttf = minimal_ttf();
+        let eot = ttf_to_eot(&ttf).unwrap();
+        let orig_size = u32::from_le_bytes(eot[4..8].try_into().unwrap());
+        assert_eq!(orig_size as usize, ttf.len());
+    }
+
+    #[test]
+    fn test_woff_preserves_flavor() {
+        let ttf = minimal_ttf();
+        let woff = ttf_to_woff(&ttf).unwrap();
+        // WOFF flavor field (bytes 4–7) should match TTF sfVersion bytes 0–3
+        assert_eq!(&woff[4..8], &ttf[0..4]);
+    }
 }
