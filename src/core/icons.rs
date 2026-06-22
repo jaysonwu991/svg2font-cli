@@ -30,11 +30,7 @@ pub async fn load_icons(pattern: &str) -> Result<Vec<SvgIcon>> {
 
     for path in paths {
         let content = fs::read_to_string(&path).await?;
-        let name = sanitize_name(
-            path.file_stem()
-                .and_then(|s| s.to_str())
-                .unwrap_or("icon")
-        );
+        let name = sanitize_name(path.file_stem().and_then(|s| s.to_str()).unwrap_or("icon"));
 
         icons.push(SvgIcon {
             name,
@@ -56,11 +52,83 @@ fn sanitize_name(name: &str) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+    use tempfile::tempdir;
+    use tokio::fs;
+
     #[test]
     fn test_sanitize_name() {
         assert_eq!(sanitize_name("MyIcon"), "my-icon");
         assert_eq!(sanitize_name("home_icon"), "home-icon");
         assert_eq!(sanitize_name("user-profile"), "user-profile");
+        assert_eq!(sanitize_name("arrowRight"), "arrow-right");
+        assert_eq!(sanitize_name("icon"), "icon");
+        assert_eq!(sanitize_name("IconName"), "icon-name");
+    }
+
+    #[tokio::test]
+    async fn test_load_icons_no_match() {
+        let result = load_icons("/nonexistent/path/**/*.svg").await;
+        assert!(result.is_err());
+        let err = result.unwrap_err().to_string();
+        assert!(err.contains("No SVG files found") || err.contains("nonexistent"));
+    }
+
+    #[tokio::test]
+    async fn test_load_icons_from_dir() {
+        let dir = tempdir().unwrap();
+        let svg_content = r#"<svg viewBox="0 0 24 24"><path d="M5 5h14v14H5z"/></svg>"#;
+
+        fs::write(dir.path().join("home.svg"), svg_content)
+            .await
+            .unwrap();
+        fs::write(dir.path().join("star.svg"), svg_content)
+            .await
+            .unwrap();
+        // Non-SVG file should be ignored
+        fs::write(dir.path().join("notes.txt"), "ignore me")
+            .await
+            .unwrap();
+
+        let pattern = format!("{}/*.svg", dir.path().display());
+        let icons = load_icons(&pattern).await.unwrap();
+
+        assert_eq!(icons.len(), 2);
+        // Results should be sorted by name
+        assert_eq!(icons[0].name, "home");
+        assert_eq!(icons[1].name, "star");
+        assert_eq!(icons[0].svg, svg_content);
+    }
+
+    #[tokio::test]
+    async fn test_load_icons_sorted_order() {
+        let dir = tempdir().unwrap();
+        let svg = r#"<svg><path d="M0 0"/></svg>"#;
+
+        // Write in reverse alphabetical order
+        for name in &["zebra", "apple", "mango"] {
+            fs::write(dir.path().join(format!("{}.svg", name)), svg)
+                .await
+                .unwrap();
+        }
+
+        let pattern = format!("{}/*.svg", dir.path().display());
+        let icons = load_icons(&pattern).await.unwrap();
+
+        assert_eq!(icons[0].name, "apple");
+        assert_eq!(icons[1].name, "mango");
+        assert_eq!(icons[2].name, "zebra");
+    }
+
+    #[tokio::test]
+    async fn test_load_icons_name_sanitization() {
+        let dir = tempdir().unwrap();
+        let svg = r#"<svg><path d="M0 0"/></svg>"#;
+        fs::write(dir.path().join("MyIcon.svg"), svg).await.unwrap();
+
+        let pattern = format!("{}/*.svg", dir.path().display());
+        let icons = load_icons(&pattern).await.unwrap();
+
+        assert_eq!(icons[0].name, "my-icon");
+        assert_eq!(icons[0].source_path, dir.path().join("MyIcon.svg"));
     }
 }

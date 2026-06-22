@@ -22,8 +22,8 @@ path = "src/lib.rs"
 clap = { version = "4.5", features = ["derive"] }
 
 # SVG processing
-usvg = "0.44"
-svgtypes = "0.15"
+usvg = "0.47"
+svgtypes = "0.16"
 
 # Path and file handling
 glob = "0.3"
@@ -31,7 +31,7 @@ glob = "0.3"
 # Compression and archiving
 zip = "2.2"
 flate2 = "1.0"
-brotli = "7.0"
+brotli = "8.0"
 
 # Utilities
 anyhow = "1.0"
@@ -53,6 +53,9 @@ ahash = "0.8"
 
 # Date/time
 chrono = "0.4"
+write-fonts = "0.49"
+kurbo = "0.13"
+font-types = "0.12.0"
 
 [dev-dependencies]
 tempfile = "3.14"

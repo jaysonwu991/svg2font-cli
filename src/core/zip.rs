@@ -24,7 +24,56 @@ pub async fn create_zip(
         zip.start_file(&name, options)?;
         zip.write_all(&content)?;
     }
-    
+
     zip.finish()?;
     Ok(zip_path)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use tempfile::tempdir;
+    use zip::ZipArchive;
+
+    #[tokio::test]
+    async fn test_create_zip_produces_valid_archive() {
+        let dir = tempdir().unwrap();
+        let dist = dir.path().to_str().unwrap();
+
+        let files = vec![
+            ("iconfont.ttf".to_string(), b"fake ttf data".to_vec()),
+            ("iconfont.css".to_string(), b".icon {}".to_vec()),
+        ];
+
+        let zip_path = create_zip(dist, "iconfont", files).await.unwrap();
+        assert!(std::path::Path::new(&zip_path).exists());
+
+        let zip_file = std::fs::File::open(&zip_path).unwrap();
+        let mut archive = ZipArchive::new(zip_file).unwrap();
+        assert_eq!(archive.len(), 2);
+
+        let names: Vec<String> = (0..archive.len())
+            .map(|i| archive.by_index(i).unwrap().name().to_string())
+            .collect();
+        assert!(names.contains(&"iconfont.ttf".to_string()));
+        assert!(names.contains(&"iconfont.css".to_string()));
+    }
+
+    #[tokio::test]
+    async fn test_create_zip_path_format() {
+        let dir = tempdir().unwrap();
+        let dist = dir.path().to_str().unwrap();
+
+        let zip_path = create_zip(dist, "myfont", vec![]).await.unwrap();
+        assert!(zip_path.ends_with("myfont.zip"));
+    }
+
+    #[tokio::test]
+    async fn test_create_zip_creates_dist_dir() {
+        let dir = tempdir().unwrap();
+        let dist = format!("{}/new_subdir", dir.path().display());
+
+        create_zip(&dist, "font", vec![]).await.unwrap();
+        assert!(std::path::Path::new(&dist).exists());
+    }
 }
