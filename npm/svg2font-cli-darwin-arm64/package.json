@@ -1,5 +1,5 @@
 {
-  "name": "@jaysonwu991/svg2font-cli-darwin-arm64",
+  "name": "@jayson991/svg2font-cli-darwin-arm64",
   "version": "0.0.0",
   "description": "darwin arm64 binary for svg2font-cli",
   "os": ["darwin"],

@@ -6,15 +6,15 @@ const { platform, arch } = process;
 
 const TARGETS = {
   darwin: {
-    arm64: "@jaysonwu991/svg2font-cli-darwin-arm64/svg2font",
-    x64: "@jaysonwu991/svg2font-cli-darwin-x64/svg2font",
+    arm64: "@jayson991/svg2font-cli-darwin-arm64/svg2font",
+    x64: "@jayson991/svg2font-cli-darwin-x64/svg2font",
   },
   linux: {
-    arm64: "@jaysonwu991/svg2font-cli-linux-arm64/svg2font",
-    x64: "@jaysonwu991/svg2font-cli-linux-x64/svg2font",
+    arm64: "@jayson991/svg2font-cli-linux-arm64/svg2font",
+    x64: "@jayson991/svg2font-cli-linux-x64/svg2font",
   },
   win32: {
-    x64: "@jaysonwu991/svg2font-cli-win32-x64/svg2font.exe",
+    x64: "@jayson991/svg2font-cli-win32-x64/svg2font.exe",
   },
 };
 
