@@ -12,11 +12,11 @@
     "node": ">=18"
   },
   "optionalDependencies": {
-    "svg2font-cli-darwin-arm64": "0.0.0",
-    "svg2font-cli-darwin-x64": "0.0.0",
-    "svg2font-cli-linux-x64": "0.0.0",
-    "svg2font-cli-linux-arm64": "0.0.0",
-    "svg2font-cli-win32-x64": "0.0.0"
+    "@jaysonwu991/svg2font-cli-darwin-arm64": "0.0.0",
+    "@jaysonwu991/svg2font-cli-darwin-x64": "0.0.0",
+    "@jaysonwu991/svg2font-cli-linux-x64": "0.0.0",
+    "@jaysonwu991/svg2font-cli-linux-arm64": "0.0.0",
+    "@jaysonwu991/svg2font-cli-win32-x64": "0.0.0"
   },
   "license": "MIT",
   "repository": {

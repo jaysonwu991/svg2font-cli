@@ -1,5 +1,5 @@
 {
-  "name": "svg2font-cli-win32-x64",
+  "name": "@jaysonwu991/svg2font-cli-win32-x64",
   "version": "0.0.0",
   "description": "win32 x64 binary for svg2font-cli",
   "os": ["win32"],
