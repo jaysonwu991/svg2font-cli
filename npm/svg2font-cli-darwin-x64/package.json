@@ -1,6 +1,6 @@
 {
   "name": "svg2font-cli-darwin-x64",
-  "version": "1.0.2",
+  "version": "0.0.0",
   "description": "darwin x64 binary for svg2font-cli",
   "os": ["darwin"],
   "cpu": ["x64"],
