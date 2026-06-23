@@ -9,6 +9,7 @@ pub struct SvgIcon {
     pub source_path: PathBuf,
 }
 
+#[cfg(feature = "native")]
 pub fn sanitize_icon_name(name: &str) -> String {
     format!("{}", AsKebabCase(name))
 }

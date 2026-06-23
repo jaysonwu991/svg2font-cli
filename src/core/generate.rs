@@ -8,7 +8,9 @@ mod inner {
         svg_font::create_svg_font, ttf::create_ttf, zip::create_zip,
     };
     use crate::templates::{
-        build_css, build_demo_css, build_demo_html, build_iconfont_js, build_iconfont_manifest,
+        css::build_css,
+        demo::{build_demo_css, build_demo_html},
+        iconfont::{build_iconfont_js, build_iconfont_manifest},
     };
     use crate::utils::{ttf_to_eot, ttf_to_woff, ttf_to_woff2};
     use crate::{GenerateOptions, GenerateResult, Result};
