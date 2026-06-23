@@ -1,30 +1,20 @@
 {
-  "name": "svg2font-cli",
-  "version": "0.0.0",
-  "description": "Generate icon fonts from SVG files",
-  "bin": {
-    "svg2font": "bin/svg2font.js"
-  },
-  "files": [
-    "bin/"
+  "private": true,
+  "workspaces": [
+    "packages/*",
+    "packages/svg2font-cli/npm/*",
+    "packages/svg2font/npm/*"
   ],
-  "engines": {
-    "node": ">=18"
+  "scripts": {
+    "build": "pnpm -r --filter './packages/*' build",
+    "typecheck": "pnpm -r --filter './packages/*' typecheck",
+    "format": "oxfmt packages/svg2font/src packages/svg2font-cli/src",
+    "format:check": "oxfmt --check packages/svg2font/src packages/svg2font-cli/src",
+    "lint": "oxlint packages/svg2font/src packages/svg2font-cli/src",
+    "lint:fix": "oxlint --fix packages/svg2font/src packages/svg2font-cli/src"
   },
-  "optionalDependencies": {
-    "@jayson991/svg2font-cli-darwin-arm64": "0.0.0",
-    "@jayson991/svg2font-cli-darwin-x64": "0.0.0",
-    "@jayson991/svg2font-cli-linux-x64": "0.0.0",
-    "@jayson991/svg2font-cli-linux-arm64": "0.0.0",
-    "@jayson991/svg2font-cli-win32-x64": "0.0.0"
-  },
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/jaysonwu991/svg2font-cli"
-  },
-  "homepage": "https://github.com/jaysonwu991/svg2font-cli",
-  "bugs": {
-    "url": "https://github.com/jaysonwu991/svg2font-cli/issues"
+  "devDependencies": {
+    "oxfmt": "^0.56.0",
+    "oxlint": "^1.71.0"
   }
 }

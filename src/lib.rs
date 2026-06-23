@@ -2,6 +2,9 @@ mod core;
 mod templates;
 pub mod utils;
 
+#[cfg(feature = "napi")]
+mod napi;
+
 pub use core::{
     generate::generate_iconfont,
     glyphs::{add_codepoints, GlyphMeta},

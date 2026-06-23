@@ -1,0 +1,4 @@
+packages:
+  - "packages/*"
+  - "packages/svg2font-cli/npm/*"
+  - "packages/svg2font/npm/*"

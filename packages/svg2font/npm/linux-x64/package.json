@@ -1,7 +1,7 @@
 {
-  "name": "@jayson991/svg2font-cli-linux-x64",
+  "name": "@jayson991/svg2font-linux-x64",
   "version": "0.0.0",
-  "description": "linux x64 binary for svg2font-cli",
+  "description": "linux x64 native addon for @jayson991/svg2font",
   "os": ["linux"],
   "cpu": ["x64"],
   "engines": {
@@ -10,7 +10,7 @@
   "preferUnplugged": true,
   "license": "MIT",
   "files": [
-    "svg2font"
+    "svg2font.node"
   ],
   "repository": {
     "type": "git",
