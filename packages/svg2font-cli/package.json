@@ -18,14 +18,14 @@
   "optionalDependencies": {
     "@jayson991/svg2font-cli-darwin-arm64": "0.0.0",
     "@jayson991/svg2font-cli-darwin-x64": "0.0.0",
-    "@jayson991/svg2font-cli-linux-x64": "0.0.0",
     "@jayson991/svg2font-cli-linux-arm64": "0.0.0",
+    "@jayson991/svg2font-cli-linux-x64": "0.0.0",
     "@jayson991/svg2font-cli-win32-x64": "0.0.0"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",
     "typescript": "^5.0.0",
-    "vite": "^7.0.0"
+    "vite": "^8.0.16"
   },
   "license": "MIT",
   "repository": {
