@@ -1,3 +1,4 @@
+#[cfg(feature = "native")]
 use heck::AsKebabCase;
 use std::path::PathBuf;
 
