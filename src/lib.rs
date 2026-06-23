@@ -18,10 +18,7 @@ pub use core::{
 };
 
 #[cfg(feature = "native")]
-pub use core::{
-    generate::generate_iconfont,
-    icons::load_icons,
-};
+pub use core::{generate::generate_iconfont, icons::load_icons};
 
 pub use templates::{
     css::build_css,

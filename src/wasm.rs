@@ -76,8 +76,8 @@ pub fn generate_from_svgs(icons_json: &str, opts_json: &str) -> Result<JsValue, 
 
     let sprite = create_sprite(&glyphs, &opts.prefix);
     let svg_font = create_svg_font(&glyphs, &opts.font_name);
-    let ttf_data = create_ttf(&glyphs, &opts.font_name)
-        .map_err(|e| JsValue::from_str(&e.to_string()))?;
+    let ttf_data =
+        create_ttf(&glyphs, &opts.font_name).map_err(|e| JsValue::from_str(&e.to_string()))?;
     let woff_data = ttf_to_woff(&ttf_data).map_err(|e| JsValue::from_str(&e.to_string()))?;
     let woff2_data = ttf_to_woff2(&ttf_data).map_err(|e| JsValue::from_str(&e.to_string()))?;
     let eot_data = ttf_to_eot(&ttf_data).map_err(|e| JsValue::from_str(&e.to_string()))?;
@@ -85,7 +85,13 @@ pub fn generate_from_svgs(icons_json: &str, opts_json: &str) -> Result<JsValue, 
     let file_base = &opts.font_name;
     let cache_bust = "0".to_string();
 
-    let css = build_css(&opts.font_name, &opts.prefix, &glyphs, file_base, &cache_bust);
+    let css = build_css(
+        &opts.font_name,
+        &opts.prefix,
+        &glyphs,
+        file_base,
+        &cache_bust,
+    );
     let demo_css = build_demo_css();
     let demo_html = build_demo_html(
         &opts.font_name,

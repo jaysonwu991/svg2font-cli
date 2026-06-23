@@ -4,7 +4,10 @@ import { glob } from "glob";
 import type { GenerateOptions, GenerateResult } from "../index.d.ts";
 
 type WasmModule = {
-  generateFromSvgs: (iconsJson: string, optsJson: string) => {
+  generateFromSvgs: (
+    iconsJson: string,
+    optsJson: string,
+  ) => {
     glyphs: Array<{
       name: string;
       codepoint: number;
@@ -22,9 +25,7 @@ export async function generate(opts: GenerateOptions): Promise<GenerateResult> {
   const svgFiles = await glob(opts.src, { absolute: true });
 
   if (svgFiles.length === 0) {
-    throw new Error(
-      `@jayson991/svg2font: no SVG files found matching pattern "${opts.src}"`,
-    );
+    throw new Error(`@jayson991/svg2font: no SVG files found matching pattern "${opts.src}"`);
   }
 
   const icons = await Promise.all(

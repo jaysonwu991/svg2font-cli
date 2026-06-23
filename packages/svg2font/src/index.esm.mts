@@ -20,15 +20,13 @@ type WasmModule = {
   };
 };
 
-const wasmModule = await import("../wasm/svg2font_wasm.js") as WasmModule;
+const wasmModule = (await import("../wasm/svg2font_wasm.js")) as WasmModule;
 
 export async function generate(opts: GenerateOptions): Promise<GenerateResult> {
   const svgFiles = await glob(opts.src, { absolute: true });
 
   if (svgFiles.length === 0) {
-    throw new Error(
-      `@jayson991/svg2font: no SVG files found matching pattern "${opts.src}"`,
-    );
+    throw new Error(`@jayson991/svg2font: no SVG files found matching pattern "${opts.src}"`);
   }
 
   const icons = await Promise.all(

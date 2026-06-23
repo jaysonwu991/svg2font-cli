@@ -4,8 +4,8 @@ pub use inner::generate_iconfont;
 #[cfg(feature = "native")]
 mod inner {
     use super::super::{
-        glyphs::add_codepoints, icons::load_icons, sprite::create_sprite, svg_font::create_svg_font,
-        ttf::create_ttf, zip::create_zip,
+        glyphs::add_codepoints, icons::load_icons, sprite::create_sprite,
+        svg_font::create_svg_font, ttf::create_ttf, zip::create_zip,
     };
     use crate::templates::{
         build_css, build_demo_css, build_demo_html, build_iconfont_js, build_iconfont_manifest,
