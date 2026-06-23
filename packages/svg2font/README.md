@@ -1,19 +1,18 @@
 # @jayson991/svg2font
 
-> Generate icon fonts from SVG files — TypeScript/napi library
+> Generate icon fonts from SVG files — TypeScript/WASM library
 
 [![npm version](https://img.shields.io/npm/v/@jayson991/svg2font.svg)](https://www.npmjs.com/package/@jayson991/svg2font)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Node.js Version](https://img.shields.io/node/v/@jayson991/svg2font.svg)](https://nodejs.org/)
 
-A native Node.js addon (napi-rs) wrapping the same Rust core as the CLI. Provides full TypeScript types and `async/await` support. Zero JavaScript font dependencies — all font generation happens in native Rust code.
+A WebAssembly module wrapping the same Rust core as the CLI. Provides full TypeScript types and `async/await` support. Zero JavaScript font dependencies — all font generation happens in Rust compiled to WASM.
 
 For the CLI tool, see [`@jayson991/svg2font-cli`](../svg2font-cli/README.md).
 
 ## Requirements
 
 - Node.js 18 or higher
-- One of: macOS (arm64/x64), Linux (arm64/x64), Windows (x64)
 
 ## Installation
 
@@ -151,16 +150,6 @@ The `dist/{fontName}/` directory is created containing:
 - `demo.html` / `demo.css` — Interactive preview
 
 A ZIP archive is also written at `{dist}/{fontName}.zip`.
-
-## Platform Support
-
-| Platform | Architecture |
-|----------|-------------|
-| macOS | arm64 (Apple Silicon) |
-| macOS | x64 (Intel) |
-| Linux | x64 |
-| Linux | arm64 |
-| Windows | x64 |
 
 ## License
 

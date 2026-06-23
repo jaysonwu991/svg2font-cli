@@ -9,7 +9,7 @@ A monorepo containing two packages:
 | Package | Description |
 |---------|-------------|
 | [`@jayson991/svg2font-cli`](packages/svg2font-cli) | CLI tool — `svg2font` command |
-| [`@jayson991/svg2font`](packages/svg2font) | TypeScript/napi library for programmatic use |
+| [`@jayson991/svg2font`](packages/svg2font) | TypeScript/WASM library for programmatic use |
 
 ## Packages
 
@@ -24,7 +24,7 @@ svg2font --src "icons/**/*.svg" --dist dist --font-name myicons
 
 ### [@jayson991/svg2font](packages/svg2font/README.md)
 
-Import as a native Node.js module:
+Import as a Node.js module:
 
 ```typescript
 import { generate } from '@jayson991/svg2font';
@@ -48,14 +48,17 @@ cd svg2font
 # Build CLI binary
 cargo build --release
 
-# Build napi addon
-cargo build --release --features napi
+# Build WASM module
+cargo build --release --features wasm
 
 # Run tests
-cargo test --all-features
+cargo test
 
-# Lint
-cargo clippy --all-targets --all-features -- -D warnings
+# Lint (native targets)
+cargo clippy --all-targets -- -D warnings
+
+# Check WASM feature compiles
+cargo check --lib --features wasm --no-default-features --target wasm32-unknown-unknown
 ```
 
 ## License

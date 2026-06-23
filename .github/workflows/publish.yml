@@ -18,6 +18,7 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
         with:
           components: rustfmt, clippy
+          targets: wasm32-unknown-unknown
 
       - name: Cache cargo registry and build artifacts
         uses: actions/cache@v4
@@ -34,13 +35,16 @@ jobs:
         run: cargo fmt --all -- --check
 
       - name: Lint with Clippy
-        run: cargo clippy --all-targets --all-features -- -D warnings
+        run: cargo clippy --all-targets -- -D warnings
 
       - name: Run tests
-        run: cargo test --all-features
+        run: cargo test
 
       - name: Check napi feature compiles
         run: cargo check --features napi
+
+      - name: Check wasm feature compiles
+        run: cargo check --lib --features wasm --no-default-features --target wasm32-unknown-unknown
 
   # ─── TypeScript typecheck, lint & format ─────────────────────────────────────
   check-ts:
@@ -72,7 +76,7 @@ jobs:
       - name: Check formatting
         run: pnpm format:check
 
-  # ─── CLI binary build ───────────────────────────────────────────────────────
+  # ─── CLI binary build ─────────────────────────────────────────────────────────
   build-cli:
     name: Build CLI ${{ matrix.target }}
     needs: [check, check-ts]
@@ -126,55 +130,17 @@ jobs:
         if: "!matrix.use_cross"
         run: cargo build --release --target ${{ matrix.target }}
 
-      - name: Copy binary into npm package
-        shell: bash
-        run: |
-          cp target/${{ matrix.target }}/release/${{ matrix.binary }} packages/svg2font-cli/npm/${{ matrix.npm_pkg }}/
-
       - name: Upload CLI binary artifact
         uses: actions/upload-artifact@v4
         with:
           name: cli-${{ matrix.npm_pkg }}
-          path: packages/svg2font-cli/npm/${{ matrix.npm_pkg }}/${{ matrix.binary }}
+          path: target/${{ matrix.target }}/release/${{ matrix.binary }}
 
-  # ─── napi addon build ────────────────────────────────────────────────────────
-  build-napi:
-    name: Build napi ${{ matrix.target }}
+  # ─── WASM build ───────────────────────────────────────────────────────────────
+  build-wasm:
+    name: Build WASM
     needs: [check, check-ts]
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        include:
-          - target: aarch64-apple-darwin
-            os: macos-latest
-            npm_pkg: darwin-arm64
-            lib_prefix: lib
-            lib_ext: dylib
-
-          - target: x86_64-apple-darwin
-            os: macos-latest
-            npm_pkg: darwin-x64
-            lib_prefix: lib
-            lib_ext: dylib
-
-          - target: x86_64-unknown-linux-gnu
-            os: ubuntu-latest
-            npm_pkg: linux-x64
-            lib_prefix: lib
-            lib_ext: so
-
-          - target: aarch64-unknown-linux-gnu
-            os: ubuntu-latest
-            npm_pkg: linux-arm64
-            lib_prefix: lib
-            lib_ext: so
-            use_cross: true
-
-          - target: x86_64-pc-windows-msvc
-            os: windows-latest
-            npm_pkg: win32-x64
-            lib_prefix: ""
-            lib_ext: dll
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
@@ -182,35 +148,35 @@ jobs:
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: ${{ matrix.target }}
+          targets: wasm32-unknown-unknown
 
-      - name: Install cross (Linux ARM)
-        if: matrix.use_cross
-        run: cargo install cross --git https://github.com/cross-rs/cross
+      - name: Cache cargo registry and build artifacts
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-wasm-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-wasm-
 
-      - name: Build napi addon (cross)
-        if: matrix.use_cross
-        run: cross build --release --features napi --target ${{ matrix.target }}
+      - name: Install wasm-pack
+        run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
 
-      - name: Build napi addon (native)
-        if: "!matrix.use_cross"
-        run: cargo build --release --features napi --target ${{ matrix.target }}
+      - name: Build WASM
+        run: wasm-pack build --target nodejs --features wasm --no-default-features --out-dir packages/svg2font/wasm
 
-      - name: Rename addon to svg2font.node
-        shell: bash
-        run: |
-          cp target/${{ matrix.target }}/release/${{ matrix.lib_prefix }}svg2font.${{ matrix.lib_ext }} packages/svg2font/npm/${{ matrix.npm_pkg }}/svg2font.node
-
-      - name: Upload napi addon artifact
+      - name: Upload WASM artifact
         uses: actions/upload-artifact@v4
         with:
-          name: napi-${{ matrix.npm_pkg }}
-          path: packages/svg2font/npm/${{ matrix.npm_pkg }}/svg2font.node
+          name: svg2font-wasm
+          path: packages/svg2font/wasm/
 
-  # ─── Publish ─────────────────────────────────────────────────────────────────
+  # ─── Publish ──────────────────────────────────────────────────────────────────
   publish:
     name: Publish to npm
-    needs: [check, check-ts, build-cli, build-napi]
+    needs: [check, check-ts, build-cli, build-wasm]
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -235,11 +201,11 @@ jobs:
           pattern: cli-*
           path: cli-artifacts
 
-      - name: Download napi addons
+      - name: Download WASM artifact
         uses: actions/download-artifact@v4
         with:
-          pattern: napi-*
-          path: napi-artifacts
+          name: svg2font-wasm
+          path: packages/svg2font/wasm
 
       - name: Place CLI binaries into packages
         shell: bash
@@ -263,13 +229,6 @@ jobs:
           pnpm --filter @jayson991/svg2font-cli build
           pnpm --filter @jayson991/svg2font build
 
-      - name: Place napi addons into packages
-        shell: bash
-        run: |
-          for pkg in darwin-arm64 darwin-x64 linux-x64 linux-arm64 win32-x64; do
-            cp napi-artifacts/napi-$pkg/svg2font.node packages/svg2font/npm/$pkg/svg2font.node
-          done
-
       - name: Stamp version into all npm packages
         run: |
           VERSION=${{ steps.version.outputs.VERSION }}
@@ -277,11 +236,6 @@ jobs:
           # CLI platform packages
           for pkg in darwin-arm64 darwin-x64 linux-x64 linux-arm64 win32-x64; do
             npm version "$VERSION" --no-git-tag-version --prefix packages/svg2font-cli/npm/$pkg
-          done
-
-          # napi platform packages
-          for pkg in darwin-arm64 darwin-x64 linux-x64 linux-arm64 win32-x64; do
-            npm version "$VERSION" --no-git-tag-version --prefix packages/svg2font/npm/$pkg
           done
 
           # svg2font-cli root package + update optionalDependencies
@@ -294,15 +248,8 @@ jobs:
             fs.writeFileSync('packages/svg2font-cli/package.json', JSON.stringify(pkg, null, 2) + '\n');
           "
 
-          # svg2font library root package + update optionalDependencies
+          # svg2font library root package
           npm version "$VERSION" --no-git-tag-version --prefix packages/svg2font
-          node -e "
-            const fs = require('fs');
-            const pkg = JSON.parse(fs.readFileSync('packages/svg2font/package.json'));
-            const v = '$VERSION';
-            for (const k of Object.keys(pkg.optionalDependencies)) pkg.optionalDependencies[k] = v;
-            fs.writeFileSync('packages/svg2font/package.json', JSON.stringify(pkg, null, 2) + '\n');
-          "
 
       - name: Publish CLI platform packages
         env:
@@ -316,14 +263,6 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: npm publish packages/svg2font-cli/ --access public
-
-      - name: Publish napi platform packages
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: |
-          for pkg in darwin-arm64 darwin-x64 linux-x64 linux-arm64 win32-x64; do
-            npm publish packages/svg2font/npm/$pkg/ --access public
-          done
 
       - name: Publish @jayson991/svg2font
         env:

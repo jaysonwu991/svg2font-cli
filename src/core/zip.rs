@@ -1,15 +1,35 @@
 use crate::Result;
 use std::io::Write;
-use tokio::fs;
 use zip::write::FileOptions;
 use zip::ZipWriter;
 
-/// Create ZIP archive with font files
+/// Create ZIP archive in memory and return the raw bytes
+pub fn create_zip_bytes(files: Vec<(String, Vec<u8>)>) -> Result<Vec<u8>> {
+    let buf = std::io::Cursor::new(Vec::new());
+    let mut zip = ZipWriter::new(buf);
+
+    let options = FileOptions::<()>::default()
+        .compression_method(zip::CompressionMethod::Deflated)
+        .unix_permissions(0o755);
+
+    for (name, content) in files {
+        zip.start_file(&name, options)?;
+        zip.write_all(&content)?;
+    }
+
+    let cursor = zip.finish()?;
+    Ok(cursor.into_inner())
+}
+
+/// Create ZIP archive with font files, writing to disk
+#[cfg(feature = "native")]
 pub async fn create_zip(
     dist: &str,
     file_base: &str,
     files: Vec<(String, Vec<u8>)>,
 ) -> Result<String> {
+    use tokio::fs;
+
     fs::create_dir_all(dist).await?;
 
     let zip_path = format!("{}/{}.zip", dist, file_base);
@@ -29,7 +49,7 @@ pub async fn create_zip(
     Ok(zip_path)
 }
 
-#[cfg(test)]
+#[cfg(all(test, feature = "native"))]
 mod tests {
     use super::*;
     use tempfile::tempdir;

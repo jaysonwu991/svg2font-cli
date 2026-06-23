@@ -3,8 +3,7 @@
   "packageManager": "pnpm@10.34.3",
   "workspaces": [
     "packages/*",
-    "packages/svg2font-cli/npm/*",
-    "packages/svg2font/npm/*"
+    "packages/svg2font-cli/npm/*"
   ],
   "scripts": {
     "build": "pnpm -r --filter './packages/*' build",

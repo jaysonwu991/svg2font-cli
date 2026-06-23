@@ -1,7 +1,7 @@
 {
   "name": "@jayson991/svg2font",
   "version": "0.0.0",
-  "description": "Generate icon fonts from SVG files — TypeScript/napi library",
+  "description": "Generate icon fonts from SVG files — TypeScript/WASM library",
   "main": "dist/index.cjs",
   "module": "dist/index.esm.mjs",
   "types": "index.d.ts",
@@ -14,6 +14,7 @@
   },
   "files": [
     "dist/",
+    "wasm/",
     "index.d.ts"
   ],
   "engines": {
@@ -23,12 +24,8 @@
     "build": "vite build && vite build --config vite.esm.config.mts",
     "typecheck": "tsc"
   },
-  "optionalDependencies": {
-    "@jayson991/svg2font-darwin-arm64": "0.0.0",
-    "@jayson991/svg2font-darwin-x64": "0.0.0",
-    "@jayson991/svg2font-linux-arm64": "0.0.0",
-    "@jayson991/svg2font-linux-x64": "0.0.0",
-    "@jayson991/svg2font-win32-x64": "0.0.0"
+  "dependencies": {
+    "glob": "^11.0.0"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",

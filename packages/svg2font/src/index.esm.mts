@@ -1,35 +1,66 @@
 /// <reference types="node" />
 
-type PlatformTargets = {
-  [platform: string]: {
-    [arch: string]: string;
+import { mkdir, readFile, writeFile } from "node:fs/promises";
+import path from "node:path";
+import { glob } from "glob";
+import type { GenerateOptions, GenerateResult } from "../index.d.ts";
+
+type WasmModule = {
+  generateFromSvgs: (
+    iconsJson: string,
+    optsJson: string,
+  ) => {
+    glyphs: Array<{
+      name: string;
+      codepoint: number;
+      unicode: string;
+      className: string;
+    }>;
+    files: Record<string, Uint8Array>;
   };
 };
 
-const TARGETS: PlatformTargets = {
-  darwin: {
-    arm64: "@jayson991/svg2font-darwin-arm64",
-    x64: "@jayson991/svg2font-darwin-x64",
-  },
-  linux: {
-    arm64: "@jayson991/svg2font-linux-arm64",
-    x64: "@jayson991/svg2font-linux-x64",
-  },
-  win32: {
-    x64: "@jayson991/svg2font-win32-x64",
-  },
-};
+const wasmModule = (await import("../wasm/svg2font_wasm.js")) as WasmModule;
 
-const { platform, arch } = process;
-const pkg: string | undefined = TARGETS[platform]?.[arch];
+export async function generate(opts: GenerateOptions): Promise<GenerateResult> {
+  const svgFiles = await glob(opts.src, { absolute: true });
 
-if (!pkg) {
-  throw new Error(
-    `@jayson991/svg2font: unsupported platform ${platform}/${arch}\n` +
-      `  Supported: darwin/arm64, darwin/x64, linux/arm64, linux/x64, win32/x64`,
+  if (svgFiles.length === 0) {
+    throw new Error(`@jayson991/svg2font: no SVG files found matching pattern "${opts.src}"`);
+  }
+
+  const icons = await Promise.all(
+    svgFiles.map(async (filePath: string) => ({
+      name: path.basename(filePath, ".svg"),
+      content: await readFile(filePath, "utf-8"),
+    })),
   );
+
+  const result = wasmModule.generateFromSvgs(
+    JSON.stringify(icons),
+    JSON.stringify({
+      fontName: opts.fontName,
+      prefix: opts.prefix ?? "icon",
+      startCodepoint: opts.startCodepoint ?? 0xe001,
+    }),
+  );
+
+  const fontDir = path.join(opts.dist, opts.fontName);
+  await mkdir(fontDir, { recursive: true });
+
+  const zipName = `${opts.fontName}.zip`;
+  const zipPath = path.join(opts.dist, zipName);
+
+  for (const [name, bytes] of Object.entries(result.files)) {
+    if (name === zipName) {
+      await writeFile(zipPath, bytes);
+    } else {
+      await writeFile(path.join(fontDir, name), bytes);
+    }
+  }
+
+  return {
+    glyphs: result.glyphs,
+    zipPath,
+  };
 }
-
-const addon = await import(pkg);
-
-export default addon.default ?? addon;

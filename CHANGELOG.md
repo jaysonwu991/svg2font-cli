@@ -14,17 +14,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- **`@jayson991/svg2font`** — new TypeScript/napi library package for programmatic use
-  - Native Node.js addon built with napi-rs (no child_process spawning)
+- **`@jayson991/svg2font`** — new TypeScript/WASM library package for programmatic use
+  - WebAssembly module compiled from Rust (no child_process spawning)
   - Full TypeScript type definitions (`index.d.ts`)
   - Async `generate()` function returning `Promise<GenerateResult>`
-  - Platform-specific prebuilt addons: macOS (arm64/x64), Linux (arm64/x64), Windows (x64)
-- **napi feature flag** — `cargo build --features napi` builds the `.node` addon
+  - Works on any platform that runs Node.js 18+
+- **wasm feature flag** — `cargo build --features wasm` builds the WASM module
 
 ### Changed
 
 - Root `package.json` is now a private workspace manifest (not published)
-- CI workflow updated: separate build jobs for CLI binaries and napi addons
+- CI workflow updated: separate jobs for Rust checks (lint, test, WASM feature) and TypeScript typecheck/lint
 - All documentation rewritten to reflect the actual Rust implementation
 
 ---

@@ -5,13 +5,20 @@ pub mod utils;
 #[cfg(feature = "napi")]
 mod napi;
 
+#[cfg(feature = "wasm")]
+pub mod wasm;
+
 pub use core::{
-    generate::generate_iconfont,
     glyphs::{add_codepoints, GlyphMeta},
-    icons::{load_icons, SvgIcon},
+    icons::SvgIcon,
     sprite::create_sprite,
     svg_font::create_svg_font,
+    ttf::create_ttf,
+    zip::create_zip_bytes,
 };
+
+#[cfg(feature = "native")]
+pub use core::{generate::generate_iconfont, icons::load_icons};
 
 pub use templates::{
     css::build_css,
@@ -30,15 +37,10 @@ pub const DEFAULT_DESCENT: i32 = -128;
 /// Options for generating icon fonts
 #[derive(Debug, Clone)]
 pub struct GenerateOptions {
-    /// Source SVG files pattern (glob)
     pub src: String,
-    /// Output directory
     pub dist: String,
-    /// Font family name
     pub font_name: String,
-    /// CSS class prefix
     pub prefix: String,
-    /// Starting Unicode codepoint
     pub start_codepoint: u32,
 }
 
@@ -57,9 +59,7 @@ impl Default for GenerateOptions {
 /// Result of icon font generation
 #[derive(Debug)]
 pub struct GenerateResult {
-    /// Generated glyphs with metadata
     pub glyphs: Vec<GlyphMeta>,
-    /// Path to generated ZIP file
     pub zip_path: String,
 }
 
