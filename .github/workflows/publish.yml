@@ -6,36 +6,104 @@ on:
       - "v*"
 
 jobs:
-  build:
-    name: Build ${{ matrix.target }}
+  # ─── Lint, format & test ─────────────────────────────────────────────────────
+  check:
+    name: Lint, Format & Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - name: Cache cargo registry and build artifacts
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-
+
+      - name: Check formatting
+        run: cargo fmt --all -- --check
+
+      - name: Lint with Clippy
+        run: cargo clippy --all-targets --all-features -- -D warnings
+
+      - name: Run tests
+        run: cargo test --all-features
+
+      - name: Check napi feature compiles
+        run: cargo check --features napi
+
+  # ─── TypeScript typecheck, lint & format ─────────────────────────────────────
+  check-ts:
+    name: TypeScript Typecheck, Lint & Format
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Check formatting
+        run: pnpm format:check
+
+  # ─── CLI binary build ───────────────────────────────────────────────────────
+  build-cli:
+    name: Build CLI ${{ matrix.target }}
+    needs: [check, check-ts]
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         include:
           - target: aarch64-apple-darwin
             os: macos-latest
-            npm_pkg: svg2font-cli-darwin-arm64
+            npm_pkg: darwin-arm64
             binary: svg2font
 
           - target: x86_64-apple-darwin
             os: macos-latest
-            npm_pkg: svg2font-cli-darwin-x64
+            npm_pkg: darwin-x64
             binary: svg2font
 
           - target: x86_64-unknown-linux-gnu
             os: ubuntu-latest
-            npm_pkg: svg2font-cli-linux-x64
+            npm_pkg: linux-x64
             binary: svg2font
 
           - target: aarch64-unknown-linux-gnu
             os: ubuntu-latest
-            npm_pkg: svg2font-cli-linux-arm64
+            npm_pkg: linux-arm64
             binary: svg2font
             use_cross: true
 
           - target: x86_64-pc-windows-msvc
             os: windows-latest
-            npm_pkg: svg2font-cli-win32-x64
+            npm_pkg: win32-x64
             binary: svg2font.exe
 
     steps:
@@ -61,17 +129,88 @@ jobs:
       - name: Copy binary into npm package
         shell: bash
         run: |
-          cp target/${{ matrix.target }}/release/${{ matrix.binary }} npm/${{ matrix.npm_pkg }}/
+          cp target/${{ matrix.target }}/release/${{ matrix.binary }} packages/svg2font-cli/npm/${{ matrix.npm_pkg }}/
 
-      - name: Upload binary artifact
+      - name: Upload CLI binary artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.npm_pkg }}
-          path: npm/${{ matrix.npm_pkg }}/${{ matrix.binary }}
+          name: cli-${{ matrix.npm_pkg }}
+          path: packages/svg2font-cli/npm/${{ matrix.npm_pkg }}/${{ matrix.binary }}
 
+  # ─── napi addon build ────────────────────────────────────────────────────────
+  build-napi:
+    name: Build napi ${{ matrix.target }}
+    needs: [check, check-ts]
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - target: aarch64-apple-darwin
+            os: macos-latest
+            npm_pkg: darwin-arm64
+            lib_prefix: lib
+            lib_ext: dylib
+
+          - target: x86_64-apple-darwin
+            os: macos-latest
+            npm_pkg: darwin-x64
+            lib_prefix: lib
+            lib_ext: dylib
+
+          - target: x86_64-unknown-linux-gnu
+            os: ubuntu-latest
+            npm_pkg: linux-x64
+            lib_prefix: lib
+            lib_ext: so
+
+          - target: aarch64-unknown-linux-gnu
+            os: ubuntu-latest
+            npm_pkg: linux-arm64
+            lib_prefix: lib
+            lib_ext: so
+            use_cross: true
+
+          - target: x86_64-pc-windows-msvc
+            os: windows-latest
+            npm_pkg: win32-x64
+            lib_prefix: ""
+            lib_ext: dll
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Install cross (Linux ARM)
+        if: matrix.use_cross
+        run: cargo install cross --git https://github.com/cross-rs/cross
+
+      - name: Build napi addon (cross)
+        if: matrix.use_cross
+        run: cross build --release --features napi --target ${{ matrix.target }}
+
+      - name: Build napi addon (native)
+        if: "!matrix.use_cross"
+        run: cargo build --release --features napi --target ${{ matrix.target }}
+
+      - name: Rename addon to svg2font.node
+        shell: bash
+        run: |
+          cp target/${{ matrix.target }}/release/${{ matrix.lib_prefix }}svg2font.${{ matrix.lib_ext }} packages/svg2font/npm/${{ matrix.npm_pkg }}/svg2font.node
+
+      - name: Upload napi addon artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: napi-${{ matrix.npm_pkg }}
+          path: packages/svg2font/npm/${{ matrix.npm_pkg }}/svg2font.node
+
+  # ─── Publish ─────────────────────────────────────────────────────────────────
   publish:
     name: Publish to npm
-    needs: build
+    needs: [check, check-ts, build-cli, build-napi]
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -90,45 +229,90 @@ jobs:
         id: version
         run: echo "VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
 
-      - name: Download all binaries
+      - name: Download CLI binaries
         uses: actions/download-artifact@v4
         with:
-          path: npm-artifacts
+          pattern: cli-*
+          path: cli-artifacts
 
-      - name: Place binaries into npm packages
+      - name: Download napi addons
+        uses: actions/download-artifact@v4
+        with:
+          pattern: napi-*
+          path: napi-artifacts
+
+      - name: Place CLI binaries into packages
         shell: bash
         run: |
-          for pkg in svg2font-cli-darwin-arm64 svg2font-cli-darwin-x64 svg2font-cli-linux-x64 svg2font-cli-linux-arm64; do
-            cp npm-artifacts/$pkg/svg2font npm/$pkg/svg2font
-            chmod +x npm/$pkg/svg2font
+          for pkg in darwin-arm64 darwin-x64 linux-x64 linux-arm64; do
+            cp cli-artifacts/cli-$pkg/svg2font packages/svg2font-cli/npm/$pkg/svg2font
+            chmod +x packages/svg2font-cli/npm/$pkg/svg2font
           done
-          cp npm-artifacts/svg2font-cli-win32-x64/svg2font.exe npm/svg2font-cli-win32-x64/svg2font.exe
+          cp cli-artifacts/cli-win32-x64/svg2font.exe packages/svg2font-cli/npm/win32-x64/svg2font.exe
+
+      - name: Place napi addons into packages
+        shell: bash
+        run: |
+          for pkg in darwin-arm64 darwin-x64 linux-x64 linux-arm64 win32-x64; do
+            cp napi-artifacts/napi-$pkg/svg2font.node packages/svg2font/npm/$pkg/svg2font.node
+          done
 
       - name: Stamp version into all npm packages
         run: |
           VERSION=${{ steps.version.outputs.VERSION }}
-          for pkg in svg2font-cli-darwin-arm64 svg2font-cli-darwin-x64 svg2font-cli-linux-x64 svg2font-cli-linux-arm64 svg2font-cli-win32-x64; do
-            npm version "$VERSION" --no-git-tag-version --prefix npm/$pkg
+
+          # CLI platform packages
+          for pkg in darwin-arm64 darwin-x64 linux-x64 linux-arm64 win32-x64; do
+            npm version "$VERSION" --no-git-tag-version --prefix packages/svg2font-cli/npm/$pkg
           done
-          # Update root package.json version and optionalDependencies
-          npm version "$VERSION" --no-git-tag-version
+
+          # napi platform packages
+          for pkg in darwin-arm64 darwin-x64 linux-x64 linux-arm64 win32-x64; do
+            npm version "$VERSION" --no-git-tag-version --prefix packages/svg2font/npm/$pkg
+          done
+
+          # svg2font-cli root package + update optionalDependencies
+          npm version "$VERSION" --no-git-tag-version --prefix packages/svg2font-cli
           node -e "
             const fs = require('fs');
-            const pkg = JSON.parse(fs.readFileSync('package.json'));
+            const pkg = JSON.parse(fs.readFileSync('packages/svg2font-cli/package.json'));
             const v = '$VERSION';
             for (const k of Object.keys(pkg.optionalDependencies)) pkg.optionalDependencies[k] = v;
-            fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2) + '\n');
+            fs.writeFileSync('packages/svg2font-cli/package.json', JSON.stringify(pkg, null, 2) + '\n');
           "
 
-      - name: Publish platform packages
+          # svg2font library root package + update optionalDependencies
+          npm version "$VERSION" --no-git-tag-version --prefix packages/svg2font
+          node -e "
+            const fs = require('fs');
+            const pkg = JSON.parse(fs.readFileSync('packages/svg2font/package.json'));
+            const v = '$VERSION';
+            for (const k of Object.keys(pkg.optionalDependencies)) pkg.optionalDependencies[k] = v;
+            fs.writeFileSync('packages/svg2font/package.json', JSON.stringify(pkg, null, 2) + '\n');
+          "
+
+      - name: Publish CLI platform packages
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
-          for pkg in svg2font-cli-darwin-arm64 svg2font-cli-darwin-x64 svg2font-cli-linux-x64 svg2font-cli-linux-arm64 svg2font-cli-win32-x64; do
-            npm publish npm/$pkg/ --access public
+          for pkg in darwin-arm64 darwin-x64 linux-x64 linux-arm64 win32-x64; do
+            npm publish packages/svg2font-cli/npm/$pkg/ --access public
           done
 
-      - name: Publish root package
+      - name: Publish @jayson991/svg2font-cli
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: npm publish --access public
+        run: npm publish packages/svg2font-cli/ --access public
+
+      - name: Publish napi platform packages
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          for pkg in darwin-arm64 darwin-x64 linux-x64 linux-arm64 win32-x64; do
+            npm publish packages/svg2font/npm/$pkg/ --access public
+          done
+
+      - name: Publish @jayson991/svg2font
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish packages/svg2font/ --access public

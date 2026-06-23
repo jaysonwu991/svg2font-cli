@@ -5,6 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.0] - 2026-06-23
+
+### Breaking Changes
+
+- **Renamed packages** — `svg2font-cli` → `@jayson991/svg2font-cli`
+- **Monorepo restructure** — packages now live under `packages/svg2font-cli/` and `packages/svg2font/`
+
+### Added
+
+- **`@jayson991/svg2font`** — new TypeScript/napi library package for programmatic use
+  - Native Node.js addon built with napi-rs (no child_process spawning)
+  - Full TypeScript type definitions (`index.d.ts`)
+  - Async `generate()` function returning `Promise<GenerateResult>`
+  - Platform-specific prebuilt addons: macOS (arm64/x64), Linux (arm64/x64), Windows (x64)
+- **napi feature flag** — `cargo build --features napi` builds the `.node` addon
+
+### Changed
+
+- Root `package.json` is now a private workspace manifest (not published)
+- CI workflow updated: separate build jobs for CLI binaries and napi addons
+- All documentation rewritten to reflect the actual Rust implementation
+
+---
+
 ## [1.0.2] - 2025-12-26
 
 ### ✨ Improvements
@@ -131,5 +155,6 @@ ISC
 
 ---
 
-[1.0.2]: https://github.com/jaysonwu991/svg2font-cli/releases/tag/v1.0.2
-[1.0.0]: https://github.com/jaysonwu991/svg2font-cli/releases/tag/v1.0.0
+[2.0.0]: https://github.com/jaysonwu991/svg2font/releases/tag/v2.0.0
+[1.0.2]: https://github.com/jaysonwu991/svg2font/releases/tag/v1.0.2
+[1.0.0]: https://github.com/jaysonwu991/svg2font/releases/tag/v1.0.0
