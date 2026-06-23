@@ -1,5 +1,6 @@
 {
   "private": true,
+  "packageManager": "pnpm@10.34.3",
   "workspaces": [
     "packages/*",
     "packages/svg2font-cli/npm/*",

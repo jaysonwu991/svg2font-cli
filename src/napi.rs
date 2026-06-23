@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use napi::bindgen_prelude::*;
 use napi_derive::napi;
 
