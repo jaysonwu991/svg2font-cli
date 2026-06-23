@@ -165,7 +165,7 @@ jobs:
         run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
 
       - name: Build WASM
-        run: wasm-pack build --target nodejs --out-dir packages/svg2font/wasm -- --features wasm --no-default-features
+        run: wasm-pack build --target nodejs --out-dir packages/svg2font/wasm --out-name svg2font_wasm -- --features wasm --no-default-features
 
       - name: Upload WASM artifact
         uses: actions/upload-artifact@v4
