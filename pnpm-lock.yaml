@@ -16,6 +16,22 @@ importers:
         version: 1.71.0
 
   packages/svg2font:
+    optionalDependencies:
+      '@jayson991/svg2font-darwin-arm64':
+        specifier: 0.0.0
+        version: link:npm/darwin-arm64
+      '@jayson991/svg2font-darwin-x64':
+        specifier: 0.0.0
+        version: link:npm/darwin-x64
+      '@jayson991/svg2font-linux-arm64':
+        specifier: 0.0.0
+        version: link:npm/linux-arm64
+      '@jayson991/svg2font-linux-x64':
+        specifier: 0.0.0
+        version: link:npm/linux-x64
+      '@jayson991/svg2font-win32-x64':
+        specifier: 0.0.0
+        version: link:npm/win32-x64
     devDependencies:
       '@types/node':
         specifier: ^24.0.0
@@ -28,6 +44,22 @@ importers:
         version: 8.0.16(@types/node@24.13.2)(esbuild@0.27.7)
 
   packages/svg2font-cli:
+    optionalDependencies:
+      '@jayson991/svg2font-cli-darwin-arm64':
+        specifier: 0.0.0
+        version: link:npm/darwin-arm64
+      '@jayson991/svg2font-cli-darwin-x64':
+        specifier: 0.0.0
+        version: link:npm/darwin-x64
+      '@jayson991/svg2font-cli-linux-arm64':
+        specifier: 0.0.0
+        version: link:npm/linux-arm64
+      '@jayson991/svg2font-cli-linux-x64':
+        specifier: 0.0.0
+        version: link:npm/linux-x64
+      '@jayson991/svg2font-cli-win32-x64':
+        specifier: 0.0.0
+        version: link:npm/win32-x64
     devDependencies:
       '@types/node':
         specifier: ^24.0.0
