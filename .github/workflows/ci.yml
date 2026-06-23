@@ -21,6 +21,7 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
         with:
           components: rustfmt, clippy
+          targets: wasm32-unknown-unknown
 
       - name: Cache cargo registry and build artifacts
         uses: actions/cache@v4
@@ -37,13 +38,16 @@ jobs:
         run: cargo fmt --all -- --check
 
       - name: Lint with Clippy
-        run: cargo clippy --all-targets --all-features -- -D warnings
+        run: cargo clippy --all-targets -- -D warnings
 
       - name: Run tests
-        run: cargo test --all-features
+        run: cargo test
 
       - name: Check napi feature compiles
         run: cargo check --features napi
+
+      - name: Check wasm feature compiles
+        run: cargo check --lib --features wasm --no-default-features --target wasm32-unknown-unknown
 
   check-ts:
     name: TypeScript Typecheck, Lint & Format
