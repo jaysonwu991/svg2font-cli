@@ -1,3 +1,5 @@
+/// <reference types="node" />
+
 type PlatformTargets = {
   [platform: string]: {
     [arch: string]: string;
