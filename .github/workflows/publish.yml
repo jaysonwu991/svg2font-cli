@@ -250,6 +250,19 @@ jobs:
           done
           cp cli-artifacts/cli-win32-x64/svg2font.exe packages/svg2font-cli/npm/win32-x64/svg2font.exe
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build JS packages
+        run: |
+          pnpm --filter @jayson991/svg2font-cli build
+          pnpm --filter @jayson991/svg2font build
+
       - name: Place napi addons into packages
         shell: bash
         run: |
